@@ -31,11 +31,12 @@ class DatabaseHelper {
         return db.execute(
             "CREATE TABLE Milestones(id TEXT PRIMARY KEY, parentId TEXT, title TEXT, enddate TEXT, reminder INTEGER)");
       }, version: 1);
-      milestoneDb.insert(
+      int result = await milestoneDb.insert(
         table,
         data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace,
       );
+      print(result);
     }
   }
 

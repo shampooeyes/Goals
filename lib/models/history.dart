@@ -9,13 +9,16 @@ class History extends ChangeNotifier {
     return [..._history];
   }
 
-  void addGoal(Goal goal) {
+  void addGoal(goal) {
     // Must receive as goal
+    if (goal.runtimeType == Milestone) {
+      addMilestone(goal);
+      return;
+    }
     _history.add(goal);
   }
 
-  void addMilestone(Milestone milestone) {
-    // Must receive as milestone
+  void addMilestone(milestone) {
     _history.add(milestone);
   }
 }

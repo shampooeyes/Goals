@@ -10,8 +10,9 @@ import 'new_milestone_screen.dart';
 class EditGoalScreen extends StatefulWidget {
   static const routeName = "edit-goal-screen";
   final String goalKey;
+  bool isGoal;
 
-  EditGoalScreen(this.goalKey);
+  EditGoalScreen(this.goalKey, {this.isGoal = true,});
 
   @override
   _EditGoalScreenState createState() => _EditGoalScreenState();
@@ -444,8 +445,8 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
                     child: GestureDetector(
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
-                            builder: (ctx) =>
-                                NewMilestoneScreen(_addMilestone, widget.goalKey)));
+                            builder: (ctx) => NewMilestoneScreen(
+                                _addMilestone, widget.goalKey)));
                       },
                       child: Icon(
                         CupertinoIcons.add,

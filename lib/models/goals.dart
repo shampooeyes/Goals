@@ -8,14 +8,12 @@ class GoalList extends ChangeNotifier {
     // completeGoal
     _goals.removeWhere((goal) => goal.key == key.toString());
     DatabaseHelper.removeGoal("Goals", key);
-    notifyListeners();
   }
 
   void completeMilestone(String key, String parentKey) {
     final goal = _goals.firstWhere((goal) => goal.key == parentKey);
     goal.milestones.removeWhere((milestone) => milestone.key == key);
     DatabaseHelper.removeGoal("Milestones", key);
-    notifyListeners();
   }
 
   Future<void> fetchAndSetGoals() async {
@@ -31,11 +29,13 @@ class GoalList extends ChangeNotifier {
             title: milestone["title"],
             enddate: DateTime.parse(milestone["enddate"])))
         .toList();
+    print(milestones.length);
 
     goals.forEach((goal) {
       List<Milestone> _goalMilestones = _milestones
-          .where((milestone) => milestone.parentKey == goal["key"])
+          .where((milestone) => milestone.parentKey == goal["id"])
           .toList();
+    print(_goalMilestones.length);
       Goal finalGoal = Goal(
           key: goal["id"],
           parentKey: goal["parentId"],
