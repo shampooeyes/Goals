@@ -164,6 +164,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                 if (!isSelected) {
                                   setState(() {
                                     selectedDate = dates[index];
+                                    snapshot.notifyAllListeners();
                                   });
                                 }
                               },
@@ -224,15 +225,13 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                             ),
                                           ),
                                         ),
-                                    duration: Duration(milliseconds: 500));
+                                    duration: Duration(milliseconds: 350));
                                 tiles.removeAt(index);
 
-                                Future.delayed(
-                                    Duration(milliseconds: 1000),
-                                    () => goal.runtimeType == Goal
-                                        ? snapshot.completeGoal(goal.key)
-                                        : snapshot.completeMilestone(
-                                            goal.key, goal.parentKey));
+                                isGoal
+                                    ? snapshot.completeGoal(goal.key)
+                                    : snapshot.completeMilestone(
+                                        goal.key, goal.parentKey);
                               }
 
                               if (tiles[index].runtimeType == Goal) {

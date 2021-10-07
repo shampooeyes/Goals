@@ -55,7 +55,8 @@ class _GoalTileState extends State<GoalTile> {
     final milestone = widget.goal
         ? goal
         : goal.milestones.firstWhere((mile) => mile.key == widget.goalKey);
-    widget.helper(widget.key, milestone, goal); //milestone is the same goal if type is Goal
+    widget.helper(widget.key, milestone,
+        goal); //milestone is the same goal if type is Goal
     Provider.of<History>(context, listen: false).addGoal(goal);
   }
 
@@ -126,10 +127,10 @@ class _GoalTileState extends State<GoalTile> {
                       Radius.circular(10),
                     )),
                     onChanged: (value) {
+                        if (value == null) return;
                       setState(() {
-                        isFinished = value!;
+                        isFinished = value;
                       });
-                      Future.delayed(Duration(milliseconds: 250), () {});
                       Future.delayed(Duration(milliseconds: 450),
                           () => _completeGoal(context));
                     },

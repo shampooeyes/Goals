@@ -35,7 +35,7 @@ class GoalList extends ChangeNotifier {
       List<Milestone> _goalMilestones = _milestones
           .where((milestone) => milestone.parentKey == goal["id"])
           .toList();
-    print(_goalMilestones.length);
+      print(_goalMilestones.length);
       Goal finalGoal = Goal(
           key: goal["id"],
           parentKey: goal["parentId"],
@@ -145,6 +145,10 @@ class GoalList extends ChangeNotifier {
     dates.sort((a, b) => a.compareTo(b));
 
     return dates;
+  }
+
+  void notifyAllListeners() {
+    notifyListeners();
   }
 }
 
