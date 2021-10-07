@@ -29,13 +29,11 @@ class GoalList extends ChangeNotifier {
             title: milestone["title"],
             enddate: DateTime.parse(milestone["enddate"])))
         .toList();
-    print(milestones.length);
 
     goals.forEach((goal) {
       List<Milestone> _goalMilestones = _milestones
           .where((milestone) => milestone.parentKey == goal["id"])
           .toList();
-      print(_goalMilestones.length);
       Goal finalGoal = Goal(
           key: goal["id"],
           parentKey: goal["parentId"],
@@ -59,7 +57,6 @@ class GoalList extends ChangeNotifier {
       var j = 0;
       DateTime date = DateTime.now();
       while (goal.enddate.isAfter(date)) {
-        print(j);
         j++;
         date = date.add(Duration(days: goal.repeat));
       }
@@ -111,7 +108,7 @@ class GoalList extends ChangeNotifier {
       "repeat": goal.repeat,
       "enddate": goal.enddate.toIso8601String(),
     });
-
+    goal.milestones.forEach((mile) => mile.parentTitle = goal.title);
     goal.sortAndNumberMilestones();
     _goals.add(goal);
     notifyListeners();
@@ -188,6 +185,7 @@ class Milestone {
   final String key;
   final String parentKey;
   final String title;
+  String parentTitle;
   final DateTime enddate;
   int milestoneNumber = 0;
 
@@ -195,6 +193,7 @@ class Milestone {
     required this.key,
     required this.parentKey,
     required this.title,
+    this.parentTitle = "",
     required this.enddate,
   });
 }

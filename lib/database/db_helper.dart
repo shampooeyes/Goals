@@ -2,15 +2,6 @@ import 'package:sqflite/sqflite.dart' as sql;
 import 'package:path/path.dart' as path;
 
 class DatabaseHelper {
-  // static Future<Database> database() async {
-  //   final dbPath = await sql.getDatabasesPath();
-  //   return sql.openDatabase(path.join(dbPath, "goals.db"),
-  //       onCreate: (db, version) {
-  //     return db.execute(
-  //         "CREATE TABLE Goals(id TEXT PRIMARY KEY, parentId TEXT, title TEXT, desc TEXT, enddate TEXT, reminder INTEGER, repeat INTEGER)");
-  //   },version: 1);
-  // }
-
   static Future<void> insertGoal(String table, Map<String, Object> data) async {
     final dbPath = await sql.getDatabasesPath();
     if (table == "Goals") {
@@ -43,10 +34,9 @@ class DatabaseHelper {
   static Future<void> removeGoal(String table, String id) async {
     final bool isGoal = table == "Goals" ? true : false;
     final dbPath = await sql.getDatabasesPath();
-    final db = await sql
+    final goalDb = await sql
         .openDatabase(path.join(dbPath, isGoal ? "goals.db" : "milestones.db"));
-    final result = await db.delete(table, where: "id = ?", whereArgs: [id]);
-    print(result);
+    goalDb.delete(table, where: "id = ?", whereArgs: [id]);
   }
 
   static Future<void> insertHabit(
@@ -62,6 +52,15 @@ class DatabaseHelper {
       data,
       conflictAlgorithm: sql.ConflictAlgorithm.replace,
     );
+  }
+
+  static Future<void> insertHistory(Map<String, dynamic> data) async {
+    final dbPath = await sql.getDatabasesPath();
+    final historyDb = await sql.openDatabase(path.join(dbPath, "history.db"),
+        onCreate: (db, version) => db.execute(
+            "CREATE TABLE History(id TEXT PRIMARY KEY, title TEXT, desc TEXT, targetDate TEXT, finishedDate TEXT, isGoal INT)"),
+        version: 1);
+    historyDb.insert("History", data);
   }
 
   static Future<List<Map<String, dynamic>>> getHabitsData() async {

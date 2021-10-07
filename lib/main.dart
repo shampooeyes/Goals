@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:mygoals/models/goals.dart';
 import 'package:mygoals/models/habits.dart';
 import 'package:mygoals/screens/goals_screen.dart';
+import 'package:mygoals/screens/history_screen.dart';
 
 import 'package:provider/provider.dart';
 
@@ -82,6 +83,7 @@ class MyApp extends StatelessWidget {
         routes: {
           "/": (ctx) => GoalsScreen(),
           NewGoalScreen.routeName: (ctx) => NewGoalScreen(),
+          HistoryScreen.routeName: (ctx) => HistoryScreen(),
         },
       ),
     );

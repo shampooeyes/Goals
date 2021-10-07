@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mygoals/models/goals.dart';
 import 'package:mygoals/models/habits.dart';
+import 'package:mygoals/screens/history_screen.dart';
 import 'package:mygoals/screens/new_goal_screen.dart';
 import 'package:mygoals/widgets/date_chip.dart';
 import 'package:mygoals/widgets/goal_tile.dart';
@@ -68,7 +69,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
             style: Theme.of(context).appBarTheme.titleTextStyle),
         actions: [
           IconButton(
-            onPressed: () {}, //Navigate to history page
+            onPressed: () {
+              Navigator.of(context).pushNamed(HistoryScreen.routeName);
+            },
             icon: Icon(Icons.history, size: 30),
           )
         ],

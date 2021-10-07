@@ -127,11 +127,11 @@ class _GoalTileState extends State<GoalTile> {
                       Radius.circular(10),
                     )),
                     onChanged: (value) {
-                        if (value == null) return;
+                      if (value == null) return;
                       setState(() {
                         isFinished = value;
                       });
-                      Future.delayed(Duration(milliseconds: 450),
+                      Future.delayed(Duration(milliseconds: 200),
                           () => _completeGoal(context));
                     },
                   ),
