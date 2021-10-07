@@ -59,7 +59,9 @@ class _HistoryTileState extends State<HistoryTile> {
                 alignment: Alignment.bottomRight,
                 child: Text(
                   "Target Date: ${DateFormat("dd MMM yyyy").format(widget.targetDate)}",
-                  style: const TextStyle(color: Color(0xff97b1aa)),
+                  style: const TextStyle(
+                      color: const Color(0xff97b1aa),
+                      fontWeight: FontWeight.w400),
                 ),
               ),
               Row(
@@ -72,7 +74,7 @@ class _HistoryTileState extends State<HistoryTile> {
                         Container(
                           margin: const EdgeInsets.only(left: 15),
                           width: MediaQuery.of(context).size.width / 2 - 30,
-                          height: 1,
+                          height: .7,
                           child: Container(
                             color: Color(0xff97b1aa),
                           ),
@@ -98,7 +100,7 @@ class _HistoryTileState extends State<HistoryTile> {
                         Container(
                           margin: const EdgeInsets.only(right: 15),
                           width: MediaQuery.of(context).size.width / 2 - 30,
-                          height: 1,
+                          height: .7,
                           child: Container(
                             color: Color(0xff97b1aa),
                           ),

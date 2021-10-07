@@ -6,8 +6,13 @@ import 'goals.dart';
 class History extends ChangeNotifier {
   List<HistoryItem> _history = [];
 
-  List<HistoryItem> getHistory() {
-    return [..._history];
+  List<HistoryItem> getHistory(DateTime filterDate) {
+    List<HistoryItem> result = [];
+    _history.forEach((item) {
+      if (item.finishedDate.month == filterDate.month) result.add(item);
+    });
+
+    return [...result];
   }
 
   void addGoal(final goal) {

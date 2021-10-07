@@ -10,7 +10,7 @@ import 'new_milestone_screen.dart';
 class EditGoalScreen extends StatefulWidget {
   static const routeName = "edit-goal-screen";
   final String goalKey;
-  bool isGoal;
+  final bool isGoal;
 
   EditGoalScreen(this.goalKey, {this.isGoal = true,});
 

@@ -92,7 +92,7 @@ class GoalTileCopy extends StatelessWidget {
                   children: [
                     // Goal settings (repeat, goal, milestone)
                     Text(
-                      isGoal ? "Goal" : "Milestone ${milestoneNumber}",
+                      isGoal ? "Goal" : "Milestone $milestoneNumber",
                       style: TextStyle(
                           fontSize: 12,
                           fontFamily: "Poppins",

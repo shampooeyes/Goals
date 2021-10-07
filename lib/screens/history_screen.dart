@@ -4,9 +4,22 @@ import 'package:mygoals/widgets/date_scroller.dart';
 import 'package:mygoals/widgets/history_tile.dart';
 import 'package:provider/provider.dart';
 
-class HistoryScreen extends StatelessWidget {
+class HistoryScreen extends StatefulWidget {
   static const routeName = "history-screen";
   const HistoryScreen({Key? key}) : super(key: key);
+
+  @override
+  _HistoryScreenState createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
+  DateTime filterDate = DateTime.now();
+
+  void _changePeriod(DateTime date) {
+    setState(() {
+      filterDate = date;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +38,7 @@ class HistoryScreen extends StatelessWidget {
                   left: 6, top: 10, right: 16, bottom: 10),
               child: Row(
                 children: [
-                  DateScroller(),
+                  DateScroller(_changePeriod, filterDate),
                 ],
               ),
             ),
@@ -38,8 +51,9 @@ class HistoryScreen extends StatelessWidget {
             ),
             //History items filtered by datescroller
             Consumer<History>(builder: (ctx, snapshot, child) {
-              List<HistoryItem> _items = snapshot.getHistory();
+              List<HistoryItem> _items = snapshot.getHistory(filterDate);
               return ListView.builder(
+                shrinkWrap: true,
                 itemCount: _items.length,
                 itemBuilder: (ctx, index) {
                   return HistoryTile(
@@ -55,8 +69,8 @@ class HistoryScreen extends StatelessWidget {
             Divider(
               endIndent: 35,
               indent: 35,
-              // color: Color(0xff97b1aa),
-              thickness: 1,
+              color: Color(0xff97b1aa).withOpacity(0.6),
+              thickness: 0.5,
               height: 0,
             )
           ],
