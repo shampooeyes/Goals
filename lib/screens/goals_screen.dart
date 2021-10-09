@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mygoals/models/goals.dart';
 import 'package:mygoals/models/habits.dart';
+import 'package:mygoals/models/history.dart';
 import 'package:mygoals/screens/history_screen.dart';
 import 'package:mygoals/screens/new_goal_screen.dart';
 import 'package:mygoals/widgets/date_chip.dart';
@@ -13,6 +14,7 @@ import 'package:mygoals/widgets/goal_tile.dart';
 import 'package:mygoals/widgets/goal_tile_copy.dart';
 import 'package:mygoals/widgets/habit_tile.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import '../Palette.dart';
 
@@ -26,6 +28,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
   late DateTime selectedDate;
   @override
   void initState() {
+    Firebase.initializeApp();
     initialize();
     _confettiController =
         ConfettiController(duration: const Duration(milliseconds: 400));
@@ -40,6 +43,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
     final habitProvider = Provider.of<HabitList>(context, listen: false);
     await habitProvider.fetchAndSetHabits();
     habitProvider.setStreaks();
+    Provider.of<History>(context, listen: false).fetchAndSetHistory();
   }
 
   void playConfetti() {
@@ -48,6 +52,135 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> animations = [
+      //Animation 1
+      Stack(children: [
+        Positioned(
+            bottom: 0,
+            child: ConfettiWidget(
+              blastDirectionality: BlastDirectionality.directional,
+              blastDirection: 6.5 * pi / 4,
+              confettiController: _confettiController,
+              numberOfParticles: 20,
+              maximumSize: const Size(17, 17),
+              minimumSize: const Size(10, 10),
+              gravity: 0.35,
+              colors: [
+                Palette.red,
+                Palette.primary,
+                Palette.secondary,
+                Palette.status,
+                Palette.white
+              ],
+              minBlastForce: 110,
+              maxBlastForce: 140,
+              emissionFrequency: 0.25,
+            )),
+        Positioned(
+            bottom: 0,
+            right: 0,
+            child: ConfettiWidget(
+              blastDirectionality: BlastDirectionality.directional,
+              blastDirection: 5.5 * pi / 4,
+              confettiController: _confettiController,
+              numberOfParticles: 20,
+              maximumSize: const Size(17, 17),
+              minimumSize: const Size(10, 10),
+              gravity: 0.35,
+              colors: [
+                Palette.red,
+                Palette.primary,
+                Palette.secondary,
+                Palette.status,
+                Palette.white
+              ],
+              minBlastForce: 110,
+              maxBlastForce: 140,
+              emissionFrequency: 0.25,
+            )),
+        Positioned(
+          top: 0,
+          left: MediaQuery.of(context).size.width / 2,
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            child: ConfettiWidget(
+              blastDirectionality: BlastDirectionality.explosive,
+              confettiController: _confettiController,
+              numberOfParticles: 30,
+              maximumSize: const Size(20, 20),
+              minimumSize: const Size(15, 15),
+              gravity: 0.5,
+              colors: [
+                Palette.red,
+                Palette.primary,
+                Palette.secondary,
+                Palette.status,
+                Palette.white
+              ],
+              minBlastForce: 40,
+              maxBlastForce: 60,
+              emissionFrequency: 0.25,
+            ),
+          ),
+        ),
+      ]),
+      // Animation 2
+      Stack(children: [
+        Positioned(
+          left: -20,
+          top: MediaQuery.of(context).size.height / 2,
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            child: ConfettiWidget(
+              blastDirectionality: BlastDirectionality.explosive,
+              confettiController: _confettiController,
+              numberOfParticles: 30,
+              maximumSize: const Size(17, 17),
+              minimumSize: const Size(12, 12),
+              gravity: 0.33,
+              colors: [
+                Palette.red,
+                Palette.primary,
+                Palette.secondary,
+                Palette.status,
+                Palette.white
+              ],
+              minBlastForce: 50,
+              maxBlastForce: 70,
+              emissionFrequency: 0.25,
+            ),
+          ),
+        ),
+        Positioned(
+          left: MediaQuery.of(context).size.width + 20,
+          top: MediaQuery.of(context).size.height / 2,
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            child: ConfettiWidget(
+              blastDirectionality: BlastDirectionality.explosive,
+              confettiController: _confettiController,
+              numberOfParticles: 30,
+              maximumSize: const Size(17, 17),
+              minimumSize: const Size(12, 12),
+              gravity: 0.33,
+              colors: [
+                Palette.red,
+                Palette.primary,
+                Palette.secondary,
+                Palette.status,
+                Palette.white
+              ],
+              minBlastForce: 50,
+              maxBlastForce: 70,
+              emissionFrequency: 0.25,
+            ),
+          ),
+        ),
+      ]),
+    ];
+
+    int random = Random().nextInt(2);
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -285,74 +418,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
             ),
           ],
         ),
-        Positioned(
-            bottom: 0,
-            child: ConfettiWidget(
-              blastDirectionality: BlastDirectionality.directional,
-              blastDirection: 6.5 * pi / 4,
-              confettiController: _confettiController,
-              numberOfParticles: 20,
-              maximumSize: const Size(17, 17),
-              minimumSize: const Size(10, 10),
-              gravity: 0.3,
-              colors: [
-                Palette.red,
-                Palette.primary,
-                Palette.secondary,
-                Palette.status,
-                Palette.white
-              ],
-              minBlastForce: 110,
-              maxBlastForce: 140,
-              emissionFrequency: 0.25,
-            )),
-        Positioned(
-            bottom: 0,
-            right: 0,
-            child: ConfettiWidget(
-              blastDirectionality: BlastDirectionality.directional,
-              blastDirection: 5.5 * pi / 4,
-              confettiController: _confettiController,
-              numberOfParticles: 20,
-              maximumSize: const Size(17, 17),
-              minimumSize: const Size(10, 10),
-              gravity: 0.3,
-              colors: [
-                Palette.red,
-                Palette.primary,
-                Palette.secondary,
-                Palette.status,
-                Palette.white
-              ],
-              minBlastForce: 110,
-              maxBlastForce: 140,
-              emissionFrequency: 0.25,
-            )),
-        Positioned(
-          top: 0,
-          left: MediaQuery.of(context).size.width / 2,
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            child: ConfettiWidget(
-              blastDirectionality: BlastDirectionality.explosive,
-              confettiController: _confettiController,
-              numberOfParticles: 30,
-              maximumSize: const Size(20, 20),
-              minimumSize: const Size(15, 15),
-              gravity: 0.5,
-              colors: [
-                Palette.red,
-                Palette.primary,
-                Palette.secondary,
-                Palette.status,
-                Palette.white
-              ],
-              minBlastForce: 40,
-              maxBlastForce: 60,
-              emissionFrequency: 0.25,
-            ),
-          ),
-        ),
+        animations[random]
       ]),
     );
   }

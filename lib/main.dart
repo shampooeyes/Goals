@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<History>(
           create: (_) => History(),
-        )
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

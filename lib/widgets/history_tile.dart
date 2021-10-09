@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mygoals/Palette.dart';
+import 'package:mygoals/models/history.dart';
+import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class HistoryTile extends StatefulWidget {
+  final String itemKey;
   final String title;
   final String desc;
   final bool isGoal;
@@ -10,19 +14,54 @@ class HistoryTile extends StatefulWidget {
   final DateTime finishedDate;
 
   HistoryTile({
-    Key? key,
+    required this.itemKey,
     required this.title,
     required this.desc,
     required this.isGoal,
     required this.targetDate,
     required this.finishedDate,
-  }) : super(key: key);
+  });
 
   @override
   _HistoryTileState createState() => _HistoryTileState();
 }
 
 class _HistoryTileState extends State<HistoryTile> {
+  void confirmDelete(String title) {
+    showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: Text("Are you sure?"),
+              content: Text("Delete \"$title\""),
+              actions: [
+                TextButton(
+                    onPressed: Navigator.of(context).pop,
+                    child: Text(
+                      "Cancel",
+                      style: const TextStyle(
+                        fontFamily: "OpenSans",
+                        fontSize: 17,
+                        color: Color(0xff303030),
+                      ),
+                    )),
+                TextButton(
+                    onPressed: () {
+                      Provider.of<History>(context, listen: false)
+                          .removeItem(widget.itemKey);
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      "OK",
+                      style: const TextStyle(
+                        fontFamily: "OpenSans",
+                        fontSize: 17,
+                        color: Color(0xff303030),
+                      ),
+                    ))
+              ],
+            ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -80,7 +119,9 @@ class _HistoryTileState extends State<HistoryTile> {
                           ),
                         ),
                         IconButton(
-                          onPressed: () {}, // share
+                          onPressed: () {
+                            Share.share("I finally accomplished ${widget.title}");
+                          }, // share
                           icon: Icon(
                             Icons.share,
                             color: Color(0xff97b1aa),
@@ -106,7 +147,9 @@ class _HistoryTileState extends State<HistoryTile> {
                           ),
                         ),
                         IconButton(
-                          onPressed: () {}, // delete
+                          onPressed: () {
+                            confirmDelete(widget.title);
+                          }, // delete
                           icon: Icon(
                             Icons.delete,
                             color: Color(0xff97b1aa),

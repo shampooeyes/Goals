@@ -8,6 +8,7 @@ class GoalList extends ChangeNotifier {
     // completeGoal
     _goals.removeWhere((goal) => goal.key == key.toString());
     DatabaseHelper.removeGoal("Goals", key);
+    // check for milestnes!!!
   }
 
   void completeMilestone(String key, String parentKey) {

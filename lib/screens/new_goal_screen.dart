@@ -1,3 +1,5 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -36,6 +38,14 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
   List<Milestone> _milestones = [];
   Color _buttonColor = Palette.primary;
   bool _make = true;
+
+  @override
+  void initState() {
+    super.initState();
+    final fbm =
+        FirebaseMessaging.instance; // get instance when remind me enabled
+    fbm.requestPermission();
+  }
 
   @override
   void dispose() {
@@ -708,13 +718,11 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                                             .bodyText2,
                                       ),
                                       Spacer(),
-                                      GestureDetector(
-                                          onTap: () {},
-                                          child: Icon(
-                                            Icons.calendar_today,
-                                            size: 12,
-                                            color: Palette.white,
-                                          ))
+                                      Icon(
+                                        Icons.calendar_today,
+                                        size: 12,
+                                        color: Palette.white,
+                                      )
                                     ],
                                   ),
                                 ),
@@ -797,26 +805,56 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                             "Remind Me",
                             style: Theme.of(context).textTheme.bodyText1,
                           ),
-                          Transform.scale(
-                            scale: 1.4,
-                            child: Checkbox(
-                              value: _reminder,
-                              onChanged: (val) {
-                                setState(() {
-                                  _reminder = val!;
-                                });
-                              },
-                              splashRadius: 10,
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                              activeColor: Palette.primary,
-                              side:
-                                  BorderSide(width: 2, color: Palette.primary),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.all(
-                                Radius.circular(4.5),
-                              )),
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Transform.scale(
+                                scale: 1.4,
+                                child: Checkbox(
+                                  value: _reminder,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      _reminder = val!;
+                                    });
+                                  },
+                                  splashRadius: 10,
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  activeColor: Palette.primary,
+                                  side: BorderSide(
+                                      width: 2, color: Palette.primary),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                    Radius.circular(4.5),
+                                  )),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {},
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  width: 100,
+                                  height: 27,
+                                  decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(8)),
+                                      color: _reminder
+                                          ? Palette.primary
+                                          : Palette.milestone),
+                                  child: Text(
+                                    DateFormat("hh:mm a").format(
+                                        _targetDate), // change targetdate to timeselector
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText2
+                                        ?.copyWith(
+                                            color: _reminder
+                                                ? Palette.white
+                                                : Color(0xff989898)),
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
                         ]),
                       ),

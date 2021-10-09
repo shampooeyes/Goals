@@ -63,6 +63,12 @@ class DatabaseHelper {
     historyDb.insert("History", data);
   }
 
+  static Future<void> deleteHistory(String id) async {
+    final dbPath = await sql.getDatabasesPath();
+    final db = await sql.openDatabase(path.join(dbPath, "history.db"));
+    db.delete("History", where: "id = ?", whereArgs: [id]);
+  }
+
   static Future<List<Map<String, dynamic>>> getHabitsData() async {
     final dbPath = await sql.getDatabasesPath();
     final habitDb = await sql.openDatabase(path.join(dbPath, "habits.db"),
@@ -91,5 +97,14 @@ class DatabaseHelper {
           "CREATE TABLE Milestones(id TEXT PRIMARY KEY, parentId TEXT, title TEXT, enddate TEXT)");
     }, version: 1);
     return milestoneDb.query("Milestones");
+  }
+
+  static Future<List<Map<String, dynamic>>> getHistoryData() async {
+    final dbPath = await sql.getDatabasesPath();
+    final db = await sql.openDatabase(path.join(dbPath, "history.db"),
+        onCreate: (db, version) => db.execute(
+            "CREATE TABLE History(id TEXT PRIMARY KEY, title TEXT, desc TEXT, targetDate TEXT, finishedDate TEXT, isGoal INT)"),
+        version: 1);
+    return db.query("History");
   }
 }

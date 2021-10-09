@@ -6,6 +6,19 @@ import 'goals.dart';
 class History extends ChangeNotifier {
   List<HistoryItem> _history = [];
 
+  void fetchAndSetHistory() async {
+    final data = await DatabaseHelper.getHistoryData();
+    data.forEach((item) {
+      _history.add(HistoryItem(
+          key: item["id"],
+          title: item["title"],
+          desc: item["desc"],
+          finishedDate: DateTime.parse(item["finishedDate"]),
+          targetDate: DateTime.parse(item["targetDate"]),
+          isGoal: item["isGoal"] == 1 ? true : false));
+    });
+  }
+
   List<HistoryItem> getHistory(DateTime filterDate) {
     List<HistoryItem> result = [];
     _history.forEach((item) {
@@ -41,6 +54,7 @@ class History extends ChangeNotifier {
 
   void removeItem(String key) {
     _history.removeWhere((item) => item.key == key);
+    DatabaseHelper.deleteHistory(key);
     notifyListeners();
   }
 }

@@ -23,6 +23,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final device = MediaQuery.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -52,18 +53,25 @@ class _HistoryScreenState extends State<HistoryScreen> {
             //History items filtered by datescroller
             Consumer<History>(builder: (ctx, snapshot, child) {
               List<HistoryItem> _items = snapshot.getHistory(filterDate);
-              return ListView.builder(
-                shrinkWrap: true,
-                itemCount: _items.length,
-                itemBuilder: (ctx, index) {
-                  return HistoryTile(
-                    title: _items[index].title,
-                    desc: _items[index].desc,
-                    isGoal: _items[index].isGoal,
-                    targetDate: _items[index].targetDate,
-                    finishedDate: _items[index].targetDate,
-                  );
-                },
+              return Container(
+                height: device.size.height -
+                    device.viewPadding.bottom -
+                    device.viewPadding.top -
+                    128,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _items.length,
+                  itemBuilder: (ctx, index) {
+                    return HistoryTile(
+                      itemKey: _items[index].key,
+                      title: _items[index].title,
+                      desc: _items[index].desc,
+                      isGoal: _items[index].isGoal,
+                      targetDate: _items[index].targetDate,
+                      finishedDate: _items[index].targetDate,
+                    );
+                  },
+                ),
               );
             }),
             Divider(
