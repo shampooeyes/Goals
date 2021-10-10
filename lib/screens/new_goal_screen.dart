@@ -1,5 +1,4 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -36,6 +35,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
   int _repeatMultiplier = 1;
   String _repeatPeriod = "days";
   List<Milestone> _milestones = [];
+  TimeOfDay _selectedTime = TimeOfDay(hour: 12, minute: 0);
   Color _buttonColor = Palette.primary;
   bool _make = true;
 
@@ -405,6 +405,29 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
       repeat: _repeatMultiplier * int.parse(_repeatController.text),
     ));
     Navigator.of(context).pop(null);
+  }
+
+  void _selectTime(BuildContext context) async {
+    final time = await showTimePicker(
+        context: context,
+        initialTime: _selectedTime,
+        builder: (context, child) => Theme(
+              data: ThemeData.light().copyWith(
+                  colorScheme: ColorScheme.light(
+                      primary: Palette.secondary,
+                      // onSurface: ,
+                      onSurface: Palette.secondary.withOpacity(0.7),
+                      onBackground: Palette.secondary.withOpacity(0.1))),
+              child: child!,
+            ));
+    if (time == null) {
+      return;
+    } else {
+      setState(() {
+        if (!_reminder) _reminder = true;
+        _selectedTime = time;
+      });
+    }
   }
 
   @override
@@ -830,7 +853,9 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  _selectTime(context);
+                                },
                                 child: Container(
                                   alignment: Alignment.center,
                                   width: 100,
@@ -842,8 +867,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                                           ? Palette.primary
                                           : Palette.milestone),
                                   child: Text(
-                                    DateFormat("hh:mm a").format(
-                                        _targetDate), // change targetdate to timeselector
+                                    "${_selectedTime.format(context)}",
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodyText2
