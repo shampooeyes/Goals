@@ -27,6 +27,7 @@ class HistoryTile extends StatefulWidget {
 }
 
 class _HistoryTileState extends State<HistoryTile> {
+  
   void confirmDelete(String title) {
     showDialog(
         context: context,

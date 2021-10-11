@@ -42,8 +42,36 @@ class _GoalTileState extends State<GoalTile> {
   bool isFinished = false;
 
   void _completeGoal(BuildContext context) {
-    widget.playConfetti();
     final goalProvider = Provider.of<GoalList>(context, listen: false);
+    if (widget.goal &&
+        goalProvider
+            .getGoals()
+            .firstWhere((goal) => goal.key == widget.goalKey)
+            .milestones
+            .isNotEmpty) {
+      showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+                title: Text("Outstanding Milestones"),
+                content: Text("Please complete this goal's milestones first!"),
+                actions: [
+                  TextButton(
+                      onPressed: Navigator.of(context).pop,
+                      child: Text(
+                        "OK",
+                        style: const TextStyle(
+                          fontFamily: "OpenSans",
+                          fontSize: 17,
+                          color: Color(0xff303030),
+                        ),
+                      )),
+                ],
+              ));
+      setState(() {
+        isFinished = false;
+      });
+      return;
+    }
 
     final goal = widget.goal
         ? goalProvider
@@ -57,7 +85,9 @@ class _GoalTileState extends State<GoalTile> {
         : goal.milestones.firstWhere((mile) => mile.key == widget.goalKey);
     widget.helper(widget.key, milestone,
         goal); //milestone is the same goal if type is Goal
-    Provider.of<History>(context, listen: false).addGoal(goal);
+    Provider.of<History>(context, listen: false)
+        .addGoal(widget.goal ? goal : milestone);
+    widget.playConfetti();
   }
 
   @override
