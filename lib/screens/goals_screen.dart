@@ -179,6 +179,19 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
     int random = Random().nextInt(2);
 
+    final appBar = AppBar(
+      title:
+          Text("My Goals", style: Theme.of(context).appBarTheme.titleTextStyle),
+      actions: [
+        IconButton(
+          onPressed: () {
+            Navigator.of(context).pushNamed(HistoryScreen.routeName);
+          },
+          icon: Icon(Icons.history, size: 30),
+        )
+      ],
+    );
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -195,18 +208,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
           size: 30,
         ),
       ),
-      appBar: AppBar(
-        title: Text("My Goals",
-            style: Theme.of(context).appBarTheme.titleTextStyle),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).pushNamed(HistoryScreen.routeName);
-            },
-            icon: Icon(Icons.history, size: 30),
-          )
-        ],
-      ),
+      appBar: appBar,
       body: Stack(children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,12 +281,11 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
                   final tiles = [...finalGoals, ...milestones];
 
-                  //function to remove from tiles
-
                   return Column(
                     children: [
+                      // Dates Row
                       Container(
-                        margin: const EdgeInsets.only(left: 21),
+                        margin: const EdgeInsets.only(left: 24),
                         width: MediaQuery.of(context).size.width - 21,
                         height: 26,
                         child: ListView.builder(
@@ -311,19 +312,20 @@ class _GoalsScreenState extends State<GoalsScreen> {
                           },
                         ),
                       ),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Container(
-                        // tight height
-                        margin:
-                            const EdgeInsets.only(left: 15, top: 12, right: 15),
                         height: MediaQuery.of(context).size.height -
-                            MediaQuery.of(context).viewPadding.bottom -
-                            360,
-                        width: MediaQuery.of(context).size.width - 15,
+                            MediaQuery.of(context).padding.top -
+                            appBar.preferredSize.height -
+                            250,
                         child: AnimatedList(
                             // extract to goal tile
                             key: _listKey,
                             shrinkWrap: true,
                             initialItemCount: tiles.length,
+                            physics: BouncingScrollPhysics(),
                             itemBuilder:
                                 (ctx, index, Animation<double> animation) {
                               final bool isGoal =
@@ -331,7 +333,6 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
                               void removeItem(
                                   Key key, var goal, Goal associatedGoal) {
-                                //var goal may be milestone
                                 _listKey.currentState!.removeItem(
                                     index,
                                     (context, animation) => SlideTransition(

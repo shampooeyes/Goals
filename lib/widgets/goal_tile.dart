@@ -93,16 +93,15 @@ class _GoalTileState extends State<GoalTile> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      width: 330,
-      height: 69,
+      margin: const EdgeInsets.only(left: 15, bottom: 12, right: 15),
+      height: 75,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(15)),
           boxShadow: [
             BoxShadow(
                 color: const Color(0x4d000000),
                 offset: Offset(1.2246467991473532e-16, 2),
-                blurRadius: 10,
+                blurRadius: 6,
                 spreadRadius: 0)
           ],
           color: Palette.primary),
@@ -135,8 +134,9 @@ class _GoalTileState extends State<GoalTile> {
                       onTap: () {
                         Navigator.of(context)
                             .push(MaterialPageRoute(builder: (ctx) {
-                          return EditGoalScreen(widget.goalKey,
-                              isGoal: widget.goal);
+                          return EditGoalScreen(
+                            widget.goal ? widget.goalKey : widget.parentKey,
+                          );
                         }));
                       }, // Edit Goal
                       child: Icon(
