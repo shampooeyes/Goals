@@ -1,9 +1,9 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
 import 'package:mygoals/models/habits.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import '/models/goals.dart';
 import '/screens/new_milestone_screen.dart';
@@ -38,14 +38,6 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
   TimeOfDay _selectedTime = TimeOfDay(hour: 12, minute: 0);
   Color _buttonColor = Palette.primary;
   bool _make = true;
-
-  @override
-  void initState() {
-    super.initState();
-    final fbm =
-        FirebaseMessaging.instance; // get instance when remind me enabled
-    fbm.requestPermission();
-  }
 
   @override
   void dispose() {
@@ -362,7 +354,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
         });
   }
 
-  void _submitGoal(BuildContext context) {
+  void _submitGoal(BuildContext context) async {
     if (_titleController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Please enter goal title"),
@@ -370,6 +362,22 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
         duration: Duration(seconds: 3),
       ));
       return;
+    }
+    if (_reminder) {
+      final date = DateTime(_targetDate.year, _targetDate.month,
+          _targetDate.day, _selectedTime.hour, _selectedTime.minute);
+
+      final OSDeviceState? status = await OneSignal.shared.getDeviceState();
+
+      if (status != null) {
+        final playerId = status.userId;
+        OneSignal.shared.postNotificationWithJson({
+          "app_id": "bbdc8751-01db-4011-b5c6-79c78b349bd6",
+          "include_player_ids": [playerId],
+          "contents": {"en": "Reminder: ${_titleController.text.trim()}"},
+          "delivery_time_of_day": date.toUtc().toIso8601String(),
+        });
+      }
     }
     Provider.of<GoalList>(context, listen: false).addGoal(Goal(
       key: key.toString(),

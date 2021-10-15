@@ -14,7 +14,6 @@ import 'package:mygoals/widgets/goal_tile.dart';
 import 'package:mygoals/widgets/goal_tile_copy.dart';
 import 'package:mygoals/widgets/habit_tile.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 import '../Palette.dart';
 
@@ -28,7 +27,6 @@ class _GoalsScreenState extends State<GoalsScreen> {
   late DateTime selectedDate;
   @override
   void initState() {
-    Firebase.initializeApp();
     initialize();
     _confettiController =
         ConfettiController(duration: const Duration(milliseconds: 400));

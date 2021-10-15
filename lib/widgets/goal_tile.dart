@@ -195,6 +195,7 @@ class _GoalTileState extends State<GoalTile> {
                     Icon(
                       Icons.notifications_active_outlined,
                       color: Color(0xffbeffec),
+                      size: 14,
                     ),
                 ],
               )),

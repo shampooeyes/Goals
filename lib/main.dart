@@ -4,6 +4,7 @@ import 'package:mygoals/models/goals.dart';
 import 'package:mygoals/models/habits.dart';
 import 'package:mygoals/screens/goals_screen.dart';
 import 'package:mygoals/screens/history_screen.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 import 'package:provider/provider.dart';
 
@@ -15,7 +16,22 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    super.initState();
+    OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
+    final appId = "bbdc8751-01db-4011-b5c6-79c78b349bd6";
+    OneSignal.shared.setAppId(appId);
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
