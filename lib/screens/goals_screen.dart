@@ -322,11 +322,11 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         height: 10,
                       ),
                       Container(
-                        // top margin 10
+                        // top margin
                         height: MediaQuery.of(context).size.height -
                             MediaQuery.of(context).padding.top -
                             appBar.preferredSize.height -
-                            250,
+                            267,
                         child: AnimatedList(
                             // extract to goal tile
                             key: _listKey,
