@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:mygoals/models/goals.dart';
 import 'package:mygoals/models/habits.dart';
 import 'package:mygoals/models/history.dart';
+import 'package:mygoals/screens/habit_details_screen.dart';
 import 'package:mygoals/screens/history_screen.dart';
 import 'package:mygoals/screens/new_goal_screen.dart';
 import 'package:mygoals/widgets/date_chip.dart';
@@ -212,8 +213,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              margin: const EdgeInsets.only(
-                  left: 22, right: 19, top: 12, bottom: 4),
+              margin: const EdgeInsets.only(left: 22, right: 19, top: 12),
               child: Text(
                 "Habits",
                 style: Theme.of(context).textTheme.headline1,
@@ -230,18 +230,24 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     ));
               return Container(
                 margin: const EdgeInsets.only(left: 5),
-                constraints: BoxConstraints(maxHeight: 104.5),
+                constraints: BoxConstraints(maxHeight: 132.5),
                 child: ListView.builder(
+                  physics: BouncingScrollPhysics(),
                   scrollDirection: Axis.horizontal,
                   shrinkWrap: true,
                   itemCount: _habits.length,
-                  itemBuilder: (ctx, index) => HabitTile(_habits[index]),
+                  itemBuilder: (ctx, index) => GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (ctx) =>
+                                HabitDetailsScreen(_habits[index])));
+                      },
+                      child: HabitTile(_habits[index])),
                 ),
               );
             }),
             Container(
-              margin: const EdgeInsets.only(
-                  left: 22, right: 19, top: 10, bottom: 8),
+              margin: const EdgeInsets.only(left: 22, right: 19, bottom: 8),
               child: Text(
                 "Goals",
                 style: Theme.of(context).textTheme.headline1,
@@ -284,10 +290,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   return Column(
                     children: [
                       Container(
-                        margin: const EdgeInsets.only(left: 21),
                         width: MediaQuery.of(context).size.width - 21,
                         height: 26,
                         child: ListView.builder(
+                          padding: const EdgeInsets.only(left: 5),
                           shrinkWrap: true,
                           scrollDirection: Axis.horizontal,
                           itemCount: dates.length,
@@ -313,16 +319,16 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       ),
                       Container(
                         // tight height
-                        margin:
-                            const EdgeInsets.only(left: 15, top: 12, right: 15),
+                        margin: const EdgeInsets.only(top: 12),
                         height: MediaQuery.of(context).size.height -
                             MediaQuery.of(context).viewPadding.bottom -
-                            360,
-                        width: MediaQuery.of(context).size.width - 15,
+                            350,
                         child: AnimatedList(
                             // extract to goal tile
                             key: _listKey,
                             shrinkWrap: true,
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            physics: BouncingScrollPhysics(),
                             initialItemCount: tiles.length,
                             itemBuilder:
                                 (ctx, index, Animation<double> animation) {

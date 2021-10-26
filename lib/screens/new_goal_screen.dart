@@ -375,7 +375,8 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
           "app_id": "bbdc8751-01db-4011-b5c6-79c78b349bd6",
           "include_player_ids": [playerId],
           "contents": {"en": "Reminder: ${_titleController.text.trim()}"},
-          "delivery_time_of_day": date.toUtc().toIso8601String(),
+          "delayed_option": "timezone",
+          "delivery_time_of_day": date.toIso8601String(),
         });
       }
     }
@@ -551,7 +552,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                               horizontal: 10, vertical: 8),
                           child: TextField(
                             controller: _titleController,
-                            maxLength: 26,
+                            maxLength: 50,
                             cursorColor: Palette.primary,
                             cursorHeight: 13.5,
                             cursorRadius: Radius.circular(15),
@@ -577,7 +578,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                     Container(
                         margin: const EdgeInsets.only(left: 15.5),
                         width: 360,
-                        height: 40,
+                        height: 60,
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                             border:
@@ -592,11 +593,11 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                             color: Palette.white),
                         child: Container(
                           height: 40,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 8),
+                          padding: const EdgeInsets.only(left: 10),
                           child: TextField(
                             controller: _descController,
-                            maxLength: 60,
+                            maxLength: 100,
+                            maxLines: 2,
                             cursorHeight: 13.5,
                             cursorRadius: Radius.circular(15),
                             cursorColor: Palette.primary,

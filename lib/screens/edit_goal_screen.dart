@@ -301,7 +301,7 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   child: TextField(
                     controller: _titleController,
-                    maxLength: 26,
+                    maxLength: 40,
                     cursorColor: Palette.primary,
                     cursorHeight: 13.5,
                     cursorRadius: Radius.circular(15),

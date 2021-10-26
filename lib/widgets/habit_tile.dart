@@ -11,9 +11,8 @@ class HabitTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 11),
       width: 160,
-      height: 104.5,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(15)),
           border: Border.all(
@@ -33,14 +32,23 @@ class HabitTile extends StatelessWidget {
           Positioned(
             top: 12,
             left: 10,
-            child: Text(
-              habit.title,
-              style: TextStyle(
-                  color: habit.make ? Color(0xff00564b) : Color(0xff4b0000),
-                  fontWeight: FontWeight.w400,
-                  fontFamily: "OpenSans",
-                  fontStyle: FontStyle.normal,
-                  fontSize: 16.0),
+            child: Container(
+              width: 140,
+              margin: const EdgeInsets.only(bottom: 3),
+              child: Wrap(
+                children: [
+                  Text(
+                    habit.title,
+                    style: TextStyle(
+                        color:
+                            habit.make ? Color(0xff00564b) : Color(0xff4b0000),
+                        fontWeight: FontWeight.w600,
+                        fontFamily: "OpenSans",
+                        fontStyle: FontStyle.normal,
+                        fontSize: 16.0),
+                  ),
+                ],
+              ),
             ),
           ),
           Positioned(
