@@ -10,9 +10,8 @@ import 'new_milestone_screen.dart';
 class EditGoalScreen extends StatefulWidget {
   static const routeName = "edit-goal-screen";
   final String goalKey;
-  final bool isGoal;
 
-  EditGoalScreen(this.goalKey, {this.isGoal = true,});
+  EditGoalScreen(this.goalKey);
 
   @override
   _EditGoalScreenState createState() => _EditGoalScreenState();
@@ -365,64 +364,65 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
                 style: Theme.of(context).textTheme.bodyText1,
               ),
             ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: ClampingScrollPhysics(),
-              itemBuilder: (ctx, index) {
-                return Container(
-                  margin: const EdgeInsets.only(
-                      left: 15.5, bottom: 7.5, right: 15.5),
-                  width: 360,
-                  height: 40,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      boxShadow: [
-                        BoxShadow(
-                            color: const Color(0x1a000000),
-                            offset: Offset(1.2246467991473532e-16, 2),
-                            blurRadius: 8,
-                            spreadRadius: 0)
-                      ],
-                      color: Palette.white),
-                  child: Stack(children: [
-                    Positioned(
-                      left: 15,
-                      top: 11,
-                      child: Center(
-                        child: Container(
-                          child: Text(
-                            _milestones[index].title,
-                            style: const TextStyle(
-                              color: Palette.text,
-                              fontFamily: "OpenSans",
-                              fontSize: 13.5,
+            SizedBox(
+              width: 375.5,
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: ClampingScrollPhysics(),
+                itemBuilder: (ctx, index) {
+                  return Container(
+                    margin: const EdgeInsets.only(left: 15.5, bottom: 7.5),
+                    height: 40,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        boxShadow: [
+                          BoxShadow(
+                              color: const Color(0x1a000000),
+                              offset: Offset(1.2246467991473532e-16, 2),
+                              blurRadius: 8,
+                              spreadRadius: 0)
+                        ],
+                        color: Palette.white),
+                    child: Stack(children: [
+                      Positioned(
+                        left: 15,
+                        top: 11,
+                        child: Center(
+                          child: Container(
+                            child: Text(
+                              _milestones[index].title,
+                              style: const TextStyle(
+                                color: Palette.text,
+                                fontFamily: "OpenSans",
+                                fontSize: 13.5,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    Positioned(
-                      right: 5,
-                      top: 4,
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _milestones.removeAt(index);
-                          });
-                        },
-                        child: Center(
-                          child: Icon(
-                            Icons.close,
-                            color: Palette.red,
-                            size: 34,
+                      Positioned(
+                        right: 5,
+                        top: 4,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _milestones.removeAt(index);
+                            });
+                          },
+                          child: Center(
+                            child: Icon(
+                              Icons.close,
+                              color: Palette.red,
+                              size: 34,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ]),
-                );
-              },
-              itemCount: _milestones.length,
+                    ]),
+                  );
+                },
+                itemCount: _milestones.length,
+              ),
             ),
             Container(
                 margin: const EdgeInsets.only(left: 15.5),

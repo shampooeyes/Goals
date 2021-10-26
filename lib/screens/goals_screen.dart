@@ -180,6 +180,19 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
     int random = Random().nextInt(2);
 
+    final appBar = AppBar(
+      title:
+          Text("My Goals", style: Theme.of(context).appBarTheme.titleTextStyle),
+      actions: [
+        IconButton(
+          onPressed: () {
+            Navigator.of(context).pushNamed(HistoryScreen.routeName);
+          },
+          icon: Icon(Icons.history, size: 30),
+        )
+      ],
+    );
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -196,18 +209,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
           size: 30,
         ),
       ),
-      appBar: AppBar(
-        title: Text("My Goals",
-            style: Theme.of(context).appBarTheme.titleTextStyle),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).pushNamed(HistoryScreen.routeName);
-            },
-            icon: Icon(Icons.history, size: 30),
-          )
-        ],
-      ),
+      appBar: appBar,
       body: Stack(children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -285,10 +287,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
                   final tiles = [...finalGoals, ...milestones];
 
-                  //function to remove from tiles
-
                   return Column(
                     children: [
+                      // Dates Row
                       Container(
                         width: MediaQuery.of(context).size.width - 21,
                         height: 26,
@@ -317,12 +318,15 @@ class _GoalsScreenState extends State<GoalsScreen> {
                           },
                         ),
                       ),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Container(
-                        // tight height
-                        margin: const EdgeInsets.only(top: 12),
+                        // top margin 10
                         height: MediaQuery.of(context).size.height -
-                            MediaQuery.of(context).viewPadding.bottom -
-                            350,
+                            MediaQuery.of(context).padding.top -
+                            appBar.preferredSize.height -
+                            250,
                         child: AnimatedList(
                             // extract to goal tile
                             key: _listKey,
@@ -337,7 +341,6 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
                               void removeItem(
                                   Key key, var goal, Goal associatedGoal) {
-                                //var goal may be milestone
                                 _listKey.currentState!.removeItem(
                                     index,
                                     (context, animation) => SlideTransition(

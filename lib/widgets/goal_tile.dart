@@ -100,7 +100,7 @@ class _GoalTileState extends State<GoalTile> {
             BoxShadow(
                 color: const Color(0x4d000000),
                 offset: Offset(1.2246467991473532e-16, 2),
-                blurRadius: 10,
+                blurRadius: 6,
                 spreadRadius: 0)
           ],
           color: Palette.primary),
@@ -185,8 +185,7 @@ class _GoalTileState extends State<GoalTile> {
                         onTap: () {
                           Navigator.of(context)
                               .push(MaterialPageRoute(builder: (ctx) {
-                            return EditGoalScreen(widget.goalKey,
-                                isGoal: widget.goal);
+                            return EditGoalScreen(widget.goalKey,);
                           }));
                         }, // Edit Goal
                         child: Icon(
