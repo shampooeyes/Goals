@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mygoals/database/db_helper.dart';
+import 'package:mygoals/models/event.dart';
 
 class HabitList extends ChangeNotifier {
   List<Habit> _habits = [];
@@ -59,7 +60,7 @@ class Habit {
   final bool reminder;
   final bool make;
   final DateTime creationDate;
-  Map<DateTime, bool> events = {};
+  Map<DateTime, List<Event>> events = {};
   int bestStreak = 0;
   int currentStreak = 0;
 
@@ -74,7 +75,9 @@ class Habit {
   }) {
     DateTime date = creationDate;
     while (date.isBefore(enddate)) {
-      events.update(date, (_) => false, ifAbsent: () => false);
+      events.update(DateTime(date.year, date.month, date.day),
+          (_) => [Event(done: false)],
+          ifAbsent: () => [Event(done: false)]);
       date = date.add(Duration(days: make ? repeat : 1));
     }
   }

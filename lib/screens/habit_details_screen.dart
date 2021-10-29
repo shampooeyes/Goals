@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:mygoals/models/event.dart';
 import 'package:mygoals/models/habits.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -16,23 +15,26 @@ class HabitDetailsScreen extends StatefulWidget {
 }
 
 class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
-  late Map<DateTime, List<Event>> selectedEvents;
+  // Implement ValueNotifier
+  // have totalEvents
+  // use getEventsforday to get from totalevents for day
+  // valuenotifierbuilder
+  late final ValueNotifier<List<Event>> _selectedEvents;
+  late final _totalEvents;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
-  DateTime _selectedDay = DateTime.now();
-  late Map<DateTime, bool> events;
-  late Widget event;
-
-  final _eventController = TextEditingController();
+  DateTime? _selectedDay;
 
   @override
   void initState() {
-    selectedEvents = {};
+    _totalEvents = widget.habit.events;
+    _selectedDay = _focusedDay;
+    _selectedEvents = ValueNotifier(_getEventsfromDay(_selectedDay!));
     super.initState();
   }
 
   List<Event> _getEventsfromDay(DateTime date) {
-    return selectedEvents[date] ?? [];
+    return _totalEvents[date] ?? [];
   }
 
   @override
@@ -62,11 +64,13 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
               return isSameDay(_selectedDay, day);
             },
             onDaySelected: (selectedDay, focusedDay) {
+              print(selectedDay);
               if (!isSameDay(_selectedDay, selectedDay)) {
                 setState(() {
                   _selectedDay = selectedDay;
                   _focusedDay = focusedDay;
                 });
+                _selectedEvents.value = _getEventsfromDay(selectedDay);
               }
             },
             onFormatChanged: (format) {
@@ -106,73 +110,117 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
             ),
             eventLoader: _getEventsfromDay,
           ),
-          ..._getEventsfromDay(_selectedDay).map(
-            (Event event) => GestureDetector(
-              onTap: () {
-                    setState(() {
-                      event.done = !event.done;
-                    });
-                  },
+          SizedBox(height: 10),
+          Expanded(
+            child: ValueListenableBuilder<List<Event>>(
+                valueListenable: _selectedEvents,
+                builder: (context, value, _) {
+                  return Container(
+                    // height: 100,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: value.length,
+                      itemBuilder: (ctx, index) {
+                        final event = value[index];
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              event.done = !event.done;
+                            });
+                          },
                           child: Container(
-                alignment: Alignment.center,
-                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: event.done ? Palette.primary : Palette.white,
-                  border: Border.all(color: Palette.primary),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Text(
-                  "Done",
-                  style: TextStyle(
-                      color: event.done ? Palette.white : Palette.primary,
-                      fontSize: 16),
-                ),
-              ),
-            ),
+                            alignment: Alignment.center,
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 10),
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color:
+                                  event.done ? Palette.primary : Palette.white,
+                              border: Border.all(color: Palette.primary),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Text(
+                              "Done",
+                              style: TextStyle(
+                                  color: event.done
+                                      ? Palette.white
+                                      : Palette.primary,
+                                  fontSize: 16),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }),
           ),
+
+          // ..._getEventsfromDay(_selectedDay).map(
+          //   (Event event) => GestureDetector(
+          //     onTap: () {
+          //       setState(() {
+          //         event.done = !event.done;
+          //       });
+          //     },
+          //     child: Container(
+          //       alignment: Alignment.center,
+          //       margin:
+          //           const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          //       padding: const EdgeInsets.all(10),
+          //       decoration: BoxDecoration(
+          //         color: event.done ? Palette.primary : Palette.white,
+          //         border: Border.all(color: Palette.primary),
+          //         borderRadius: BorderRadius.circular(5),
+          //       ),
+          //       child: Text(
+          //         "Done",
+          //         style: TextStyle(
+          //             color: event.done ? Palette.white : Palette.primary,
+          //             fontSize: 16),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text("Add Event"),
-            content: TextFormField(
-              controller: _eventController,
-            ),
-            actions: [
-              TextButton(
-                child: Text("Cancel"),
-                onPressed: () => Navigator.pop(context),
-              ),
-              TextButton(
-                child: Text("Ok"),
-                onPressed: () {
-                  if (_eventController.text.isEmpty) {
-                  } else {
-                    if (selectedEvents[_selectedDay] != null) {
-                      selectedEvents[_selectedDay]!.add(
-                        Event(title: _eventController.text, done: false),
-                      );
-                    } else {
-                      selectedEvents[_selectedDay] = [
-                        Event(title: _eventController.text, done: false)
-                      ];
-                    }
-                  }
-                  Navigator.pop(context);
-                  _eventController.clear();
-                  setState(() {});
-                  return;
-                },
-              ),
-            ],
-          ),
-        ),
-        label: Text("Add Event"),
-        icon: Icon(Icons.add),
-      ),
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: () => showDialog(
+      //     context: context,
+      //     builder: (context) => AlertDialog(
+      //       title: Text("Add Event"),
+      //       content: TextFormField(
+      //         controller: _eventController,
+      //       ),
+      //       actions: [
+      //         TextButton(
+      //           child: Text("Cancel"),
+      //           onPressed: () => Navigator.pop(context),
+      //         ),
+      //         TextButton(
+      //           child: Text("Ok"),
+      //           onPressed: () {
+      //             if (_eventController.text.isEmpty) {
+      //             } else {
+      //               if (_selectedEvents[_selectedDay] != null) {
+      //                 _selectedEvents[_selectedDay]!.add(
+      //                   Event(done: false),
+      //                 );
+      //               } else {
+      //                 _selectedEvents[_selectedDay] = [Event(done: false)];
+      //               }
+      //             }
+      //             Navigator.pop(context);
+      //             _eventController.clear();
+      //             setState(() {});
+      //             return;
+      //           },
+      //         ),
+      //       ],
+      //     ),
+      //   ),
+      //   label: Text("Add Event"),
+      //   icon: Icon(Icons.add),
+      // ),
     );
   }
 }
