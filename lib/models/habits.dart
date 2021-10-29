@@ -59,6 +59,7 @@ class Habit {
   final bool reminder;
   final bool make;
   final DateTime creationDate;
+  Map<DateTime, bool> events = {};
   int bestStreak = 0;
   int currentStreak = 0;
 
@@ -70,5 +71,11 @@ class Habit {
     required this.creationDate,
     required this.repeat,
     required this.reminder,
-  });
+  }) {
+    DateTime date = creationDate;
+    while (date.isBefore(enddate)) {
+      events.update(date, (_) => false, ifAbsent: () => false);
+      date = date.add(Duration(days: make ? repeat : 1));
+    }
+  }
 }
