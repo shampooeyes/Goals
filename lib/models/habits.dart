@@ -23,6 +23,12 @@ class HabitList extends ChangeNotifier {
     return [..._habits];
   }
 
+  void removeItem(String key) {
+    _habits.removeWhere((habit) => habit.key == key);
+    DatabaseHelper.deleteHabit(key);
+    notifyListeners();
+  }
+
   void setStreaks() {
     DateTime now = DateTime.now();
 

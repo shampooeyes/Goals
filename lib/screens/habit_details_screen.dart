@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mygoals/models/event.dart';
 import 'package:mygoals/models/habits.dart';
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../Palette.dart';
@@ -15,10 +16,6 @@ class HabitDetailsScreen extends StatefulWidget {
 }
 
 class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
-  // Implement ValueNotifier
-  // have totalEvents
-  // use getEventsforday to get from totalevents for day
-  // valuenotifierbuilder
   late final ValueNotifier<List<Event>> _selectedEvents;
   late final _totalEvents;
   CalendarFormat _calendarFormat = CalendarFormat.month;
@@ -34,7 +31,43 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
   }
 
   List<Event> _getEventsfromDay(DateTime date) {
-    return _totalEvents[date] ?? [];
+    return _totalEvents[DateTime(date.year, date.month, date.day)] ?? [];
+  }
+
+  void confirmDelete(String title) {
+    showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: Text("Are you sure?"),
+              content: Text("Delete \"$title\""),
+              actions: [
+                TextButton(
+                    onPressed: Navigator.of(context).pop,
+                    child: Text(
+                      "Cancel",
+                      style: const TextStyle(
+                        fontFamily: "OpenSans",
+                        fontSize: 17,
+                        color: Color(0xff303030),
+                      ),
+                    )),
+                TextButton(
+                    onPressed: () {
+                      Provider.of<HabitList>(context, listen: false)
+                          .removeItem(widget.habit.key);
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      "OK",
+                      style: const TextStyle(
+                        fontFamily: "OpenSans",
+                        fontSize: 17,
+                        color: Color(0xff303030),
+                      ),
+                    ))
+              ],
+            ));
   }
 
   @override
@@ -43,15 +76,6 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
       appBar: AppBar(
         title: Text(widget.habit.title,
             style: Theme.of(context).appBarTheme.titleTextStyle),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.delete,
-              size: 24,
-            ),
-          )
-        ],
       ),
       body: Column(
         children: [
@@ -102,11 +126,16 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
               selectedDecoration:
                   BoxDecoration(color: Palette.primary, shape: BoxShape.circle),
               todayDecoration: BoxDecoration(
-                  border: Border.all(color: Palette.primary),
+                  border: Border.all(color: Palette.background),
                   shape: BoxShape.circle),
-              todayTextStyle: TextStyle(color: Palette.text),
+              todayTextStyle: TextStyle(
+                  color: Palette.primary, fontWeight: FontWeight.w800),
               defaultTextStyle: TextStyle(color: Palette.text),
               weekendTextStyle: TextStyle(color: Palette.text),
+              markersAutoAligned: false,
+              markersOffset: PositionedOffset(bottom: 7),
+              markerDecoration:
+                  BoxDecoration(color: Palette.primary, shape: BoxShape.circle),
             ),
             eventLoader: _getEventsfromDay,
           ),
@@ -154,73 +183,26 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
                   );
                 }),
           ),
-
-          // ..._getEventsfromDay(_selectedDay).map(
-          //   (Event event) => GestureDetector(
-          //     onTap: () {
-          //       setState(() {
-          //         event.done = !event.done;
-          //       });
-          //     },
-          //     child: Container(
-          //       alignment: Alignment.center,
-          //       margin:
-          //           const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-          //       padding: const EdgeInsets.all(10),
-          //       decoration: BoxDecoration(
-          //         color: event.done ? Palette.primary : Palette.white,
-          //         border: Border.all(color: Palette.primary),
-          //         borderRadius: BorderRadius.circular(5),
-          //       ),
-          //       child: Text(
-          //         "Done",
-          //         style: TextStyle(
-          //             color: event.done ? Palette.white : Palette.primary,
-          //             fontSize: 16),
-          //       ),
-          //     ),
-          //   ),
-          // ),
+          Spacer(),
+          GestureDetector(
+            onTap: () => confirmDelete(widget.habit.title),
+            child: Container(
+              alignment: Alignment.center,
+              width: 170,
+              margin: const EdgeInsets.symmetric(vertical: 30),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Palette.red, width: 1.5),
+              ),
+              child: Text(
+                "Delete Habit",
+                style: TextStyle(color: Palette.red, fontSize: 16),
+              ),
+            ),
+          )
         ],
       ),
-      // floatingActionButton: FloatingActionButton.extended(
-      //   onPressed: () => showDialog(
-      //     context: context,
-      //     builder: (context) => AlertDialog(
-      //       title: Text("Add Event"),
-      //       content: TextFormField(
-      //         controller: _eventController,
-      //       ),
-      //       actions: [
-      //         TextButton(
-      //           child: Text("Cancel"),
-      //           onPressed: () => Navigator.pop(context),
-      //         ),
-      //         TextButton(
-      //           child: Text("Ok"),
-      //           onPressed: () {
-      //             if (_eventController.text.isEmpty) {
-      //             } else {
-      //               if (_selectedEvents[_selectedDay] != null) {
-      //                 _selectedEvents[_selectedDay]!.add(
-      //                   Event(done: false),
-      //                 );
-      //               } else {
-      //                 _selectedEvents[_selectedDay] = [Event(done: false)];
-      //               }
-      //             }
-      //             Navigator.pop(context);
-      //             _eventController.clear();
-      //             setState(() {});
-      //             return;
-      //           },
-      //         ),
-      //       ],
-      //     ),
-      //   ),
-      //   label: Text("Add Event"),
-      //   icon: Icon(Icons.add),
-      // ),
     );
   }
 }

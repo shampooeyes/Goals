@@ -69,6 +69,12 @@ class DatabaseHelper {
     db.delete("History", where: "id = ?", whereArgs: [id]);
   }
 
+  static Future<void> deleteHabit(String id) async {
+    final dbPath = await sql.getDatabasesPath();
+    final db = await sql.openDatabase(path.join(dbPath, "habits.db"));
+    db.delete("Habits", where: "id = ?", whereArgs: [id]);
+  }
+
   static Future<List<Map<String, dynamic>>> getHabitsData() async {
     final dbPath = await sql.getDatabasesPath();
     final habitDb = await sql.openDatabase(path.join(dbPath, "habits.db"),
