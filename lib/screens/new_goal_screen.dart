@@ -412,6 +412,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
       creationDate: DateTime.now(),
       reminder: _reminder,
       repeat: _repeatMultiplier * int.parse(_repeatController.text),
+      events: {},
     ));
     Navigator.of(context).pop(null);
   }

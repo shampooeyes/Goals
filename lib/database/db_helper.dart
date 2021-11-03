@@ -63,6 +63,34 @@ class DatabaseHelper {
     historyDb.insert("History", data);
   }
 
+  static Future<void> insertHabitsEvents(Map<String, dynamic> data) async {
+    final dbPath = await sql.getDatabasesPath();
+    final eventsDb = await sql.openDatabase(path.join(dbPath, "events.db"),
+        onCreate: (db, version) =>
+            db.execute("CREATE TABLE Events(id TEXT PRIMARY KEY, dates TEXT"),
+        version: 1);
+    eventsDb.insert("Events", data);
+  }
+
+  static Future<void> updateHabitsEvents(String id, Map<String, dynamic> data) async {
+    final dbPath = await sql.getDatabasesPath();
+    final eventsDb = await sql.openDatabase(path.join(dbPath, "events.db"),
+        onCreate: (db, version) =>
+            db.execute("CREATE TABLE Events(id TEXT PRIMARY KEY, dates TEXT"),
+        version: 1);
+    eventsDb.update("Events", data,where: "id = ?", whereArgs: [id]);
+  }
+
+
+  static Future<List<Map<String, dynamic>>> getHabitsEventsData() async {
+    final dbPath = await sql.getDatabasesPath();
+    final eventsDb = await sql.openDatabase(path.join(dbPath, "events.db"),
+        onCreate: (db, version) =>
+            db.execute("CREATE TABLE Events(id TEXT PRIMARY KEY, dates TEXT"),
+        version: 1);
+    return eventsDb.query("Events");
+  }
+
   static Future<void> deleteHistory(String id) async {
     final dbPath = await sql.getDatabasesPath();
     final db = await sql.openDatabase(path.join(dbPath, "history.db"));
