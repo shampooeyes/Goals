@@ -98,7 +98,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
               emissionFrequency: 0.25,
             )),
         Positioned(
-          top: 0,
+          top: -70,
           left: MediaQuery.of(context).size.width / 2,
           child: SizedBox(
             width: MediaQuery.of(context).size.width,
@@ -221,7 +221,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
               final _habits = snapshot.getHabits();
               if (_habits.isEmpty)
                 return Container(
-                    height: 100,
+                    height: 133,
                     alignment: Alignment.center,
                     child: GestureDetector(
                       onTap: () async {
@@ -232,13 +232,16 @@ class _GoalsScreenState extends State<GoalsScreen> {
                             selectedDate = response as DateTime;
                           });
                       },
-                      child: Image.asset(
-                        "assets/images/bearhabits.png",
+                      child: Container(
+                        height: 100,
+                        child: Image.asset(
+                          "assets/images/bearhabits.png",
+                        ),
                       ),
                     ));
               return Container(
                 margin: const EdgeInsets.only(left: 5),
-                constraints: BoxConstraints(maxHeight: 132.5),
+                constraints: BoxConstraints(maxHeight: 122),
                 child: ListView.builder(
                   physics: BouncingScrollPhysics(),
                   scrollDirection: Axis.horizontal,
@@ -346,7 +349,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                             // extract to goal tile
                             key: _listKey,
                             shrinkWrap: true,
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            // padding: const EdgeInsets.symmetric(horizontal: 15),
                             physics: BouncingScrollPhysics(),
                             initialItemCount: tiles.length,
                             itemBuilder:
@@ -354,36 +357,41 @@ class _GoalsScreenState extends State<GoalsScreen> {
                               final bool isGoal =
                                   tiles[index].runtimeType == Goal;
 
-                              void removeItem(
-                                  Key key, var goal, Goal associatedGoal) {
-                                _listKey.currentState!.removeItem(
-                                    index,
-                                    (context, animation) => SlideTransition(
-                                          position: animation.drive(Tween(
-                                                  begin: Offset(-0.5, 0),
-                                                  end: Offset(0, 0))
-                                              .chain(CurveTween(
-                                                  curve:
-                                                      Curves.easeInOutCubic))),
-                                          child: FadeTransition(
-                                            opacity: animation,
-                                            child: GoalTileCopy(
-                                              title: associatedGoal.title,
-                                              desc: isGoal
-                                                  ? goal.desc
-                                                  : goal.title,
-                                              isGoal: isGoal,
-                                              milestoneNumber: isGoal
-                                                  ? ""
-                                                  : "${goal.milestoneNumber}/${associatedGoal.milestones.length}",
-                                              repeat: goal.repeat == 0
-                                                  ? false
-                                                  : true,
-                                              reminder: associatedGoal.reminder,
+                              void removeItem(Key key, var goal,
+                                  Goal associatedGoal, bool dismissed) {
+                                if (!dismissed)
+                                  _listKey.currentState!.removeItem(
+                                      index,
+                                      (context, animation) => SlideTransition(
+                                            position: animation.drive(Tween(
+                                                    begin: Offset(-0.5, 0),
+                                                    end: Offset(0, 0))
+                                                .chain(CurveTween(
+                                                    curve: Curves
+                                                        .easeInOutCubic))),
+                                            child: FadeTransition(
+                                              opacity: animation,
+                                              child: GoalTileCopy(
+                                                title: associatedGoal.title,
+                                                desc: isGoal
+                                                    ? goal.desc
+                                                    : goal.title,
+                                                isGoal: isGoal,
+                                                milestoneNumber: isGoal
+                                                    ? ""
+                                                    : "${goal.milestoneNumber}/${associatedGoal.milestones.length}",
+                                                repeat: goal.repeat == 0
+                                                    ? false
+                                                    : true,
+                                                reminder:
+                                                    associatedGoal.reminder,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                    duration: Duration(milliseconds: 350));
+                                      duration: Duration(milliseconds: 350));
+                                else
+                                  _listKey.currentState!.removeItem(index,
+                                      (context, animation) => Container());
                                 tiles.removeAt(index);
 
                                 isGoal
@@ -393,20 +401,34 @@ class _GoalsScreenState extends State<GoalsScreen> {
                               }
 
                               if (tiles[index].runtimeType == Goal) {
-                                return GoalTile(
-                                  key: ValueKey(tiles[index].key),
-                                  goalKey: tiles[index].key,
-                                  parentKey: tiles[index].parentKey,
-                                  title: tiles[index].title,
-                                  desc: tiles[index].desc,
-                                  goal: true,
-                                  milestoneNumber: "",
-                                  repeat:
-                                      tiles[index].repeat == 0 ? false : true,
-                                  reminder: tiles[index].reminder,
-                                  helper: removeItem,
-                                  playConfetti: playConfetti,
-                                  notificationId: tiles[index].notificationId,
+                                return Container(
+                                  margin: const EdgeInsets.only(
+                                      bottom: 10, left: 15, right: 15),
+                                  decoration: BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: const Color(0x2a000000),
+                                          offset:
+                                              Offset(1.2246467991473532e-16, 2),
+                                          blurRadius: 6,
+                                          spreadRadius: 0)
+                                    ],
+                                  ),
+                                  child: GoalTile(
+                                    key: ValueKey(tiles[index].key),
+                                    goalKey: tiles[index].key,
+                                    parentKey: tiles[index].parentKey,
+                                    title: tiles[index].title,
+                                    desc: tiles[index].desc,
+                                    goal: true,
+                                    milestoneNumber: "",
+                                    repeat:
+                                        tiles[index].repeat == 0 ? false : true,
+                                    reminder: tiles[index].reminder,
+                                    helper: removeItem,
+                                    playConfetti: playConfetti,
+                                    notificationId: tiles[index].notificationId,
+                                  ),
                                 );
                               }
                               Goal associatedGoal = snapshot
@@ -419,20 +441,34 @@ class _GoalsScreenState extends State<GoalsScreen> {
                               int milestoneNumber =
                                   tiles[index].milestoneNumber;
 
-                              return GoalTile(
-                                key: UniqueKey(),
-                                goalKey: tiles[index].key,
-                                parentKey: tiles[index].parentKey,
-                                title: associatedGoal.title,
-                                desc: tiles[index].title,
-                                goal: false,
-                                milestoneNumber:
-                                    "$milestoneNumber/$totalMilestones",
-                                repeat: false,
-                                reminder: associatedGoal.reminder,
-                                helper: removeItem,
-                                playConfetti: playConfetti,
-                                notificationId: "",
+                              return Container(
+                                margin: const EdgeInsets.only(
+                                    bottom: 10, left: 15, right: 15),
+                                decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: const Color(0x2a000000),
+                                        offset:
+                                            Offset(1.2246467991473532e-16, 2),
+                                        blurRadius: 6,
+                                        spreadRadius: 0)
+                                  ],
+                                ),
+                                child: GoalTile(
+                                  key: UniqueKey(),
+                                  goalKey: tiles[index].key,
+                                  parentKey: tiles[index].parentKey,
+                                  title: associatedGoal.title,
+                                  desc: tiles[index].title,
+                                  goal: false,
+                                  milestoneNumber:
+                                      "$milestoneNumber/$totalMilestones",
+                                  repeat: false,
+                                  reminder: associatedGoal.reminder,
+                                  helper: removeItem,
+                                  playConfetti: playConfetti,
+                                  notificationId: "",
+                                ),
                               );
                             }),
                       ),

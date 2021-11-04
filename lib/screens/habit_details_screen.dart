@@ -133,18 +133,21 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
               ),
               calendarStyle: CalendarStyle(
                 selectedDecoration: BoxDecoration(
-                    color: Palette.primary, shape: BoxShape.circle),
+                    color: widget.habit.make ? Palette.primary : Palette.red,
+                    shape: BoxShape.circle),
                 todayDecoration: BoxDecoration(
                     border: Border.all(color: Palette.background),
                     shape: BoxShape.circle),
                 todayTextStyle: TextStyle(
-                    color: Palette.primary, fontWeight: FontWeight.w800),
+                    color: widget.habit.make ? Palette.primary : Palette.red,
+                    fontWeight: FontWeight.w800),
                 defaultTextStyle: TextStyle(color: Palette.text),
                 weekendTextStyle: TextStyle(color: Palette.text),
                 markersAutoAligned: false,
                 markersOffset: PositionedOffset(bottom: 7),
                 markerDecoration: BoxDecoration(
-                    color: Palette.primary, shape: BoxShape.circle),
+                    color: widget.habit.make ? Palette.primary : Palette.red,
+                    shape: BoxShape.circle),
               ),
               eventLoader: _getEventsfromDay,
             ),
@@ -167,14 +170,14 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
                                 color: Palette.milestone,
-                                border: Border.all(color: Color(0xff989898)),
+                                border: Border.all(
+                                    width: 1.5, color: Color(0xff989898)),
                                 borderRadius: BorderRadius.circular(5),
                               ),
                               child: Text(
                                 "Done",
                                 style: TextStyle(
-                                    color: Color(0xff989898),
-                                    fontSize: 16),
+                                    color: Color(0xff989898), fontSize: 16),
                               ),
                             );
                           return GestureDetector(
@@ -190,9 +193,15 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
                                 color: event.done
-                                    ? Palette.primary
+                                    ? widget.habit.make
+                                        ? Palette.primary
+                                        : Palette.red
                                     : Palette.white,
-                                border: Border.all(color: Palette.primary),
+                                border: Border.all(
+                                    width: 1.5,
+                                    color: widget.habit.make
+                                        ? Palette.primary
+                                        : Palette.red),
                                 borderRadius: BorderRadius.circular(5),
                               ),
                               child: Text(
@@ -200,7 +209,9 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
                                 style: TextStyle(
                                     color: event.done
                                         ? Palette.white
-                                        : Palette.primary,
+                                        : widget.habit.make
+                                            ? Palette.primary
+                                            : Palette.red,
                                     fontSize: 16),
                               ),
                             ),

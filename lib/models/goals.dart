@@ -108,6 +108,7 @@ class GoalList extends ChangeNotifier {
       "reminder": goal.reminder ? 1 : 0,
       "repeat": goal.repeat,
       "enddate": goal.enddate.toIso8601String(),
+      "notificationId": goal.notificationId,
     });
     goal.milestones.forEach((mile) => mile.parentTitle = goal.title);
     goal.sortAndNumberMilestones();

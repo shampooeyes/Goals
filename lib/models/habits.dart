@@ -55,7 +55,6 @@ class HabitList extends ChangeNotifier {
         DateTime tod = DateTime.now();
         daysAtEnd =
             DateTime(tod.year, tod.month, tod.day).difference(date).inDays;
-        print(daysAtEnd);
       }
 
       if (!habit.events[date]![0].done) {
@@ -65,7 +64,7 @@ class HabitList extends ChangeNotifier {
       }
     }
     habit.currentStreak =
-        counter == 0 ? 0 : ((counter - 1) * habit.repeat) + daysAtEnd;
+        counter == 0 ? 0 : ((counter - 1) * habit.repeat) + daysAtEnd + 1;
     habit.bestStreak = max(habit.bestStreak, habit.currentStreak);
     notifyListeners();
     DatabaseHelper.updateHabitsEvents(
@@ -152,13 +151,15 @@ class HabitList extends ChangeNotifier {
           bool dateDone =
               doneDatesList.remove(DateTime(date.year, date.month, date.day));
           return [
-            Event(done: dateDone,date: DateTime(date.year, date.month, date.day))
+            Event(
+                done: dateDone, date: DateTime(date.year, date.month, date.day))
           ]; //find where date == date in doneDatesList and set event to true
         }, ifAbsent: () {
           bool dateDone =
               doneDatesList.remove(DateTime(date.year, date.month, date.day));
           return [
-            Event(done: dateDone,date: DateTime(date.year, date.month, date.day))
+            Event(
+                done: dateDone, date: DateTime(date.year, date.month, date.day))
           ]; //find where date == date in doneDatesList and set event to true
         });
         date =
@@ -207,9 +208,18 @@ class Habit {
     if (events.isEmpty) {
       DateTime date = creationDate;
       while (date.isBefore(enddate)) {
-        events.update(DateTime(date.year, date.month, date.day),
-            (_) => [Event(done: false,date: DateTime(date.year, date.month, date.day))],
-            ifAbsent: () => [Event(done: false,date: DateTime(date.year, date.month, date.day))]);
+        events.update(
+            DateTime(date.year, date.month, date.day),
+            (_) => [
+                  Event(
+                      done: false,
+                      date: DateTime(date.year, date.month, date.day))
+                ],
+            ifAbsent: () => [
+                  Event(
+                      done: false,
+                      date: DateTime(date.year, date.month, date.day))
+                ]);
         date = date.add(Duration(days: make ? repeat : 1));
       }
     }

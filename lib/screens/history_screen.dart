@@ -62,25 +62,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   shrinkWrap: true,
                   itemCount: _items.length,
                   itemBuilder: (ctx, index) {
-                    return HistoryTile(
-                      itemKey: _items[index].key,
-                      title: _items[index].title,
-                      desc: _items[index].desc,
-                      isGoal: _items[index].isGoal,
-                      targetDate: _items[index].targetDate,
-                      finishedDate: _items[index].targetDate,
+                    return Container(
+                      child: HistoryTile(
+                        itemKey: _items[index].key,
+                        title: _items[index].title,
+                        desc: _items[index].desc,
+                        isGoal: _items[index].isGoal,
+                        targetDate: _items[index].targetDate,
+                        finishedDate: _items[index].targetDate,
+                      ),
                     );
                   },
                 ),
               );
             }),
-            Divider(
-              endIndent: 35,
-              indent: 35,
-              color: Color(0xff97b1aa).withOpacity(0.6),
-              thickness: 0.5,
-              height: 0,
-            )
           ],
         ),
       ),

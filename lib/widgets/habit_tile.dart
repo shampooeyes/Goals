@@ -11,7 +11,7 @@ class HabitTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 11),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       width: 160,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(15)),
@@ -21,9 +21,9 @@ class HabitTile extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-                color: const Color(0x33000000),
+                color: const Color(0x26000000),
                 offset: Offset(1.2246467991473532e-16, 2),
-                blurRadius: 8,
+                blurRadius: 4,
                 spreadRadius: 0)
           ],
           color: Palette.white),

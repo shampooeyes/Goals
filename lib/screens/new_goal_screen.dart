@@ -390,7 +390,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
       repeat:
           _repeater ? _repeatMultiplier * int.parse(_repeatController.text) : 0,
       reminder: _reminder,
-      notificationId: notificationId ?? "",
+      notificationId: notificationId ?? "_",
     ));
     Navigator.of(context).pop(_targetDate);
   }
@@ -444,476 +444,522 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Builder(builder: (context) {
-        return Scaffold(
-          resizeToAvoidBottomInset: false,
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerFloat,
-          floatingActionButton: GestureDetector(
-            onTap: () {
-              DefaultTabController.of(context)?.index == 0
-                  ? _submitGoal(context)
-                  : _submitHabit(context);
-            },
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 40),
-              width: 240,
-              height: 65,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(57)),
-                  boxShadow: [
-                    BoxShadow(
-                        color: const Color(0x4d000000),
-                        offset: Offset(1.2246467991473532e-16, 2),
-                        blurRadius: 10,
-                        spreadRadius: 0)
-                  ],
-                  color: DefaultTabController.of(context)?.index == 0
-                      ? Palette.primary
-                      : _buttonColor),
-              child: Center(
-                child: Text(
-                  DefaultTabController.of(context)?.index == 0
-                      ? "ADD GOAL"
-                      : "ADD HABIT",
-                  style: Theme.of(context).textTheme.button,
+    return WillPopScope(
+      onWillPop: () async {
+        FocusScope.of(context).requestFocus(new FocusNode());
+        await Future.delayed(Duration(milliseconds: 80), () {});
+        return true;
+      },
+      child: DefaultTabController(
+        length: 2,
+        child: Builder(builder: (context) {
+          return Scaffold(
+            resizeToAvoidBottomInset: false,
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+            floatingActionButton: GestureDetector(
+              onTap: () {
+                DefaultTabController.of(context)?.index == 0
+                    ? _submitGoal(context)
+                    : _submitHabit(context);
+              },
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 40),
+                width: 240,
+                height: 65,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(57)),
+                    boxShadow: [
+                      BoxShadow(
+                          color: const Color(0x4d000000),
+                          offset: Offset(1.2246467991473532e-16, 2),
+                          blurRadius: 10,
+                          spreadRadius: 0)
+                    ],
+                    color: DefaultTabController.of(context)?.index == 0
+                        ? Palette.primary
+                        : _buttonColor),
+                child: Center(
+                  child: Text(
+                    DefaultTabController.of(context)?.index == 0
+                        ? "ADD GOAL"
+                        : "ADD HABIT",
+                    style: Theme.of(context).textTheme.button,
+                  ),
                 ),
               ),
             ),
-          ),
-          appBar: AppBar(
-            centerTitle: true,
-            title: Text("New Goal",
-                style: Theme.of(context).appBarTheme.titleTextStyle),
-            bottom: TabBar(
-              onTap: (_) {
-                FocusScope.of(context).requestFocus(new FocusNode());
-                setState(() {});
-              },
-              labelColor: Palette.white,
-              unselectedLabelColor: Color(0xFFe9d5bb),
-              indicatorColor: Palette.white,
-              tabs: [
-                Tab(
-                  child: Text(
-                    "GOAL",
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                Tab(
-                  child: Text(
-                    "HABIT",
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-          body: TabBarView(
-            children: [
-              SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 20.0, top: 14.5, bottom: 5),
-                      child: Text(
-                        "Goal Title",
-                        style: Theme.of(context).textTheme.bodyText1,
+            appBar: AppBar(
+              centerTitle: true,
+              title: Text("New Goal",
+                  style: Theme.of(context).appBarTheme.titleTextStyle),
+              bottom: TabBar(
+                onTap: (_) {
+                  FocusScope.of(context).requestFocus(new FocusNode());
+                  setState(() {});
+                },
+                labelColor: Palette.white,
+                unselectedLabelColor: Color(0xFFe9d5bb),
+                indicatorColor: Palette.white,
+                tabs: [
+                  Tab(
+                    child: Text(
+                      "GOAL",
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Container(
-                        margin: const EdgeInsets.only(left: 15.5),
-                        width: 360,
-                        height: 40,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            border:
-                                Border.all(color: Palette.primary, width: 1),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: const Color(0x1a000000),
-                                  offset: Offset(1.2246467991473532e-16, 2),
-                                  blurRadius: 8,
-                                  spreadRadius: 0)
-                            ],
-                            color: Palette.white),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 8),
-                          child: TextField(
-                            controller: _titleController,
-                            maxLength: 50,
-                            cursorColor: Palette.primary,
-                            cursorHeight: 13.5,
-                            cursorRadius: Radius.circular(15),
-                            autocorrect: false,
-                            style: const TextStyle(
+                  ),
+                  Tab(
+                    child: Text(
+                      "HABIT",
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            body: TabBarView(
+              children: [
+                SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 20.0, top: 14.5, bottom: 5),
+                        child: Text(
+                          "Goal Title",
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                      ),
+                      Container(
+                          margin: const EdgeInsets.only(left: 15.5),
+                          width: 360,
+                          height: 40,
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              border:
+                                  Border.all(color: Palette.primary, width: 1),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: const Color(0x1a000000),
+                                    offset: Offset(1.2246467991473532e-16, 2),
+                                    blurRadius: 8,
+                                    spreadRadius: 0)
+                              ],
+                              color: Palette.white),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 8),
+                            child: TextField(
+                              controller: _titleController,
+                              maxLength: 50,
+                              cursorColor: Palette.primary,
+                              cursorHeight: 13.5,
+                              cursorRadius: Radius.circular(15),
+                              autocorrect: false,
+                              style: const TextStyle(
+                                  color: Palette.text,
+                                  fontFamily: "OpenSans",
+                                  fontSize: 13.5),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                counterText: "",
+                              ),
+                            ),
+                          )),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 20.0, top: 14.5, bottom: 5),
+                        child: Text(
+                          "Goal Description",
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                      ),
+                      Container(
+                          margin: const EdgeInsets.only(left: 15.5),
+                          width: 360,
+                          height: 60,
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              border:
+                                  Border.all(color: Palette.primary, width: 1),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: const Color(0x1a000000),
+                                    offset: Offset(1.2246467991473532e-16, 2),
+                                    blurRadius: 8,
+                                    spreadRadius: 0)
+                              ],
+                              color: Palette.white),
+                          child: Container(
+                            height: 40,
+                            padding: const EdgeInsets.only(left: 10),
+                            child: TextField(
+                              controller: _descController,
+                              keyboardType: TextInputType.text,
+                              maxLength: 100,
+                              maxLines: 2,
+                              cursorHeight: 13.5,
+                              cursorRadius: Radius.circular(15),
+                              cursorColor: Palette.primary,
+                              autocorrect: false,
+                              style: const TextStyle(
                                 color: Palette.text,
                                 fontFamily: "OpenSans",
-                                fontSize: 13.5),
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              counterText: "",
+                                fontSize: 13.5,
+                              ),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                counterText: "",
+                              ),
                             ),
-                          ),
-                        )),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 20.0, top: 14.5, bottom: 5),
-                      child: Text(
-                        "Goal Description",
-                        style: Theme.of(context).textTheme.bodyText1,
+                          )),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 20.0, top: 14.5, bottom: 5),
+                        child: Text(
+                          "Milestones",
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
                       ),
-                    ),
-                    Container(
-                        margin: const EdgeInsets.only(left: 15.5),
-                        width: 360,
-                        height: 60,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            border:
-                                Border.all(color: Palette.primary, width: 1),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: const Color(0x1a000000),
-                                  offset: Offset(1.2246467991473532e-16, 2),
-                                  blurRadius: 8,
-                                  spreadRadius: 0)
-                            ],
-                            color: Palette.white),
-                        child: Container(
-                          height: 40,
-                          padding: const EdgeInsets.only(left: 10),
-                          child: TextField(
-                            controller: _descController,
-                            maxLength: 100,
-                            maxLines: 2,
-                            cursorHeight: 13.5,
-                            cursorRadius: Radius.circular(15),
-                            cursorColor: Palette.primary,
-                            autocorrect: false,
-                            style: const TextStyle(
-                              color: Palette.text,
-                              fontFamily: "OpenSans",
-                              fontSize: 13.5,
-                            ),
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              counterText: "",
-                            ),
-                          ),
-                        )),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 20.0, top: 14.5, bottom: 5),
-                      child: Text(
-                        "Milestones",
-                        style: Theme.of(context).textTheme.bodyText1,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 375.5, //360 +15.5 padding
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        physics: ClampingScrollPhysics(),
-                        itemBuilder: (ctx, index) {
-                          return Container(
-                            margin:
-                                const EdgeInsets.only(left: 15.5, bottom: 7.5),
-                            height: 40,
-                            decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: const Color(0x1a000000),
-                                      offset: Offset(1.2246467991473532e-16, 2),
-                                      blurRadius: 8,
-                                      spreadRadius: 0)
-                                ],
-                                color: Palette.white),
-                            child: Stack(children: [
-                              Positioned(
-                                left: 15,
-                                top: 11,
-                                child: Center(
-                                  child: Container(
-                                    child: Text(
-                                      _milestones[index].title,
-                                      style: const TextStyle(
-                                        color: Palette.text,
-                                        fontFamily: "OpenSans",
-                                        fontSize: 13.5,
+                      SizedBox(
+                        width: 375.5, //360 +15.5 padding
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: ClampingScrollPhysics(),
+                          itemBuilder: (ctx, index) {
+                            return Container(
+                              margin: const EdgeInsets.only(
+                                  left: 15.5, bottom: 7.5),
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: const Color(0x1a000000),
+                                        offset:
+                                            Offset(1.2246467991473532e-16, 2),
+                                        blurRadius: 8,
+                                        spreadRadius: 0)
+                                  ],
+                                  color: Palette.white),
+                              child: Stack(children: [
+                                Positioned(
+                                  left: 15,
+                                  top: 11,
+                                  child: Center(
+                                    child: Container(
+                                      child: Text(
+                                        _milestones[index].title,
+                                        style: const TextStyle(
+                                          color: Palette.text,
+                                          fontFamily: "OpenSans",
+                                          fontSize: 13.5,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              Positioned(
-                                right: 5,
-                                top: 4,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _milestones.removeAt(index);
-                                    });
-                                  },
-                                  child: Center(
-                                    child: Icon(
-                                      Icons.close,
-                                      color: Palette.red,
-                                      size: 34,
+                                Positioned(
+                                  right: 5,
+                                  top: 4,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _milestones.removeAt(index);
+                                      });
+                                    },
+                                    child: Center(
+                                      child: Icon(
+                                        Icons.close,
+                                        color: Palette.red,
+                                        size: 34,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ]),
-                          );
-                        },
-                        itemCount: _milestones.length,
+                              ]),
+                            );
+                          },
+                          itemCount: _milestones.length,
+                        ),
                       ),
-                    ),
-                    Container(
-                        margin: const EdgeInsets.only(left: 15.5),
-                        width: 360,
-                        height: 40,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: const Color(0x1a000000),
-                                  offset: Offset(1.2246467991473532e-16, 2),
-                                  blurRadius: 8,
-                                  spreadRadius: 0)
-                            ],
-                            color: Palette.milestone),
-                        child: Stack(children: [
-                          Positioned(
-                            right: 3.5,
-                            top: 3.5,
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (ctx) => NewMilestoneScreen(
-                                        _addMilestone, key.toString())));
-                              },
-                              child: Icon(
-                                CupertinoIcons.add,
-                                color: Palette.white,
-                                size: 34,
+                      Container(
+                          margin: const EdgeInsets.only(left: 15.5),
+                          width: 360,
+                          height: 40,
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: const Color(0x1a000000),
+                                    offset: Offset(1.2246467991473532e-16, 2),
+                                    blurRadius: 8,
+                                    spreadRadius: 0)
+                              ],
+                              color: Palette.milestone),
+                          child: Stack(children: [
+                            Positioned(
+                              right: 3.5,
+                              top: 3.5,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (ctx) => NewMilestoneScreen(
+                                          _addMilestone, key.toString())));
+                                },
+                                child: Icon(
+                                  CupertinoIcons.add,
+                                  color: Palette.white,
+                                  size: 34,
+                                ),
                               ),
                             ),
-                          ),
-                        ])),
+                          ])),
+                      Container(
+                        margin: const EdgeInsets.only(top: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Column(
+                              children: [
+                                Text(
+                                  "Target Date",
+                                  style: Theme.of(context).textTheme.bodyText1,
+                                ),
+                                SizedBox(height: 5),
+                                GestureDetector(
+                                  onTap: () {
+                                    _selectDate(context, _targetDate);
+                                  },
+                                  child: Container(
+                                    width: 115,
+                                    height: 27,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(8)),
+                                        color: Palette.primary),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          DateFormat("dd/MM/yyyy")
+                                              .format(_targetDate),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText2,
+                                        ),
+                                        Spacer(),
+                                        Icon(
+                                          Icons.calendar_today,
+                                          size: 12,
+                                          color: Palette.white,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                            // SizedBox(
+                            //   width: 50,
+                            // ),
+                            // Column(
+                            //   children: [
+                            //     Text(
+                            //       "Repeat",
+                            //       style: Theme.of(context)
+                            //           .textTheme
+                            //           .bodyText1
+                            //           ?.copyWith(
+                            //               color: _repeater
+                            //                   ? Palette.text
+                            //                   : Color(0xff989898)),
+                            //     ),
+                            //     SizedBox(height: 5),
+                            //     GestureDetector(
+                            //       onTap: () async {
+                            //         await _selectRepeat(context);
+                            //         Future.delayed(Duration(milliseconds: 1))
+                            //             .then((value) => setState(() {}));
+                            //         if (_repeatController.text.isEmpty) {
+                            //           setState(() => _repeater = false);
+                            //         }
+                            //       },
+                            //       child: Container(
+                            //         width: 100,
+                            //         height: 27,
+                            //         decoration: BoxDecoration(
+                            //             borderRadius:
+                            //                 BorderRadius.all(Radius.circular(8)),
+                            //             color: _repeater
+                            //                 ? Palette.primary
+                            //                 : Palette.milestone),
+                            //         child: Row(
+                            //           mainAxisAlignment: MainAxisAlignment.center,
+                            //           children: [
+                            //             Icon(
+                            //               CupertinoIcons.restart,
+                            //               color: _repeater
+                            //                   ? Palette.white
+                            //                   : Color(0xff989898),
+                            //               size: 13,
+                            //             ),
+                            //             SizedBox(width: 6),
+                            //             Text(
+                            //               _repeater
+                            //                   ? _repeatController.text +
+                            //                       " " +
+                            //                       _repeatPeriod
+                            //                   : "2 days",
+                            //               style: Theme.of(context)
+                            //                   .textTheme
+                            //                   .bodyText2
+                            //                   ?.copyWith(
+                            //                       color: _repeater
+                            //                           ? Palette.white
+                            //                           : Color(0xff989898)),
+                            //             ),
+                            //           ],
+                            //         ),
+                            //       ),
+                            //     )
+                            //   ],
+                            // ),
+                          ],
+                        ),
+                      ),
+                      Center(
+                        child: Container(
+                          margin: const EdgeInsets.only(top: 19.5),
+                          child: Column(children: [
+                            Text(
+                              "Remind Me",
+                              style: Theme.of(context).textTheme.bodyText1,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Transform.scale(
+                                  scale: 1.4,
+                                  child: Checkbox(
+                                    value: _reminder,
+                                    onChanged: (val) {
+                                      setState(() {
+                                        _reminder = val!;
+                                      });
+                                    },
+                                    splashRadius: 10,
+                                    materialTapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                    activeColor: Palette.primary,
+                                    side: BorderSide(
+                                        width: 2, color: Palette.primary),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                      Radius.circular(4.5),
+                                    )),
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    _selectTime(context);
+                                  },
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    width: 100,
+                                    height: 27,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(8)),
+                                        color: _reminder
+                                            ? Palette.primary
+                                            : Palette.milestone),
+                                    child: Text(
+                                      "${_selectedTime.format(context)}",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2
+                                          ?.copyWith(
+                                              color: _reminder
+                                                  ? Palette.white
+                                                  : Color(0xff989898)),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ]),
+                        ),
+                      ),
+                      SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.2),
+                    ],
+                  ),
+                ),
+                Column(
+                  children: [
                     Container(
-                      margin: const EdgeInsets.only(top: 20),
+                      margin: EdgeInsets.only(top: 28, bottom: 20),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Column(
-                            children: [
-                              Text(
-                                "Target Date",
-                                style: Theme.of(context).textTheme.bodyText1,
-                              ),
-                              SizedBox(height: 5),
-                              GestureDetector(
-                                onTap: () {
-                                  _selectDate(context, _targetDate);
-                                },
-                                child: Container(
-                                  width: 110,
-                                  height: 27,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12),
-                                  decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(8)),
-                                      color: Palette.primary),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        DateFormat("dd/MM/yyyy")
-                                            .format(_targetDate),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyText2,
-                                      ),
-                                      Spacer(),
-                                      Icon(
-                                        Icons.calendar_today,
-                                        size: 12,
-                                        color: Palette.white,
-                                      )
-                                    ],
-                                  ),
+                          AnimatedContainer(
+                            duration: Duration(milliseconds: 600),
+                            curve: Curves.easeInOutCubic,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _make = true;
+                                  _habitTitleController.text = "";
+                                  _buttonColor = Palette.primary;
+                                  _reminder = false;
+                                });
+                              },
+                              child: AnimatedDefaultTextStyle(
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.easeOutCubic,
+                                style: TextStyle(
+                                  color: _make
+                                      ? Color(0xff00c6ac)
+                                      : Color(0xff97c7c1),
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: "Poppins",
+                                  fontSize: _make ? 28.0 : 26.0,
+                                  shadows: [
+                                    if (_make)
+                                      Shadow(
+                                          color:
+                                              Color.fromRGBO(33, 175, 134, 0.5),
+                                          blurRadius: 8),
+                                  ],
                                 ),
-                              )
-                            ],
-                          ),
-                          // SizedBox(
-                          //   width: 50,
-                          // ),
-                          // Column(
-                          //   children: [
-                          //     Text(
-                          //       "Repeat",
-                          //       style: Theme.of(context)
-                          //           .textTheme
-                          //           .bodyText1
-                          //           ?.copyWith(
-                          //               color: _repeater
-                          //                   ? Palette.text
-                          //                   : Color(0xff989898)),
-                          //     ),
-                          //     SizedBox(height: 5),
-                          //     GestureDetector(
-                          //       onTap: () async {
-                          //         await _selectRepeat(context);
-                          //         Future.delayed(Duration(milliseconds: 1))
-                          //             .then((value) => setState(() {}));
-                          //         if (_repeatController.text.isEmpty) {
-                          //           setState(() => _repeater = false);
-                          //         }
-                          //       },
-                          //       child: Container(
-                          //         width: 100,
-                          //         height: 27,
-                          //         decoration: BoxDecoration(
-                          //             borderRadius:
-                          //                 BorderRadius.all(Radius.circular(8)),
-                          //             color: _repeater
-                          //                 ? Palette.primary
-                          //                 : Palette.milestone),
-                          //         child: Row(
-                          //           mainAxisAlignment: MainAxisAlignment.center,
-                          //           children: [
-                          //             Icon(
-                          //               CupertinoIcons.restart,
-                          //               color: _repeater
-                          //                   ? Palette.white
-                          //                   : Color(0xff989898),
-                          //               size: 13,
-                          //             ),
-                          //             SizedBox(width: 6),
-                          //             Text(
-                          //               _repeater
-                          //                   ? _repeatController.text +
-                          //                       " " +
-                          //                       _repeatPeriod
-                          //                   : "2 days",
-                          //               style: Theme.of(context)
-                          //                   .textTheme
-                          //                   .bodyText2
-                          //                   ?.copyWith(
-                          //                       color: _repeater
-                          //                           ? Palette.white
-                          //                           : Color(0xff989898)),
-                          //             ),
-                          //           ],
-                          //         ),
-                          //       ),
-                          //     )
-                          //   ],
-                          // ),
-                        ],
-                      ),
-                    ),
-                    Center(
-                      child: Container(
-                        margin: const EdgeInsets.only(top: 19.5),
-                        child: Column(children: [
-                          Text(
-                            "Remind Me",
-                            style: Theme.of(context).textTheme.bodyText1,
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Transform.scale(
-                                scale: 1.4,
-                                child: Checkbox(
-                                  value: _reminder,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      _reminder = val!;
-                                    });
-                                  },
-                                  splashRadius: 10,
-                                  materialTapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                  activeColor: Palette.primary,
-                                  side: BorderSide(
-                                      width: 2, color: Palette.primary),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(
-                                    Radius.circular(4.5),
-                                  )),
+                                child: Text(
+                                  "MAKE",
                                 ),
                               ),
-                              GestureDetector(
-                                onTap: () {
-                                  _selectTime(context);
-                                },
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  width: 100,
-                                  height: 27,
-                                  decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(8)),
-                                      color: _reminder
-                                          ? Palette.primary
-                                          : Palette.milestone),
-                                  child: Text(
-                                    "${_selectedTime.format(context)}",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyText2
-                                        ?.copyWith(
-                                            color: _reminder
-                                                ? Palette.white
-                                                : Color(0xff989898)),
-                                  ),
-                                ),
-                              )
-                            ],
+                            ),
                           ),
-                        ]),
-                      ),
-                    ),
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.2),
-                  ],
-                ),
-              ),
-              Column(
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(top: 28, bottom: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        AnimatedContainer(
-                          duration: Duration(milliseconds: 600),
-                          curve: Curves.easeInOutCubic,
-                          child: GestureDetector(
+                          SizedBox(width: 78),
+                          GestureDetector(
                             onTap: () {
                               setState(() {
-                                _make = true;
+                                _make = false;
                                 _habitTitleController.text = "";
-                                _buttonColor = Palette.primary;
+                                _buttonColor = Palette.red;
                                 _reminder = false;
                               });
                             },
@@ -921,257 +967,227 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                               duration: Duration(milliseconds: 300),
                               curve: Curves.easeOutCubic,
                               style: TextStyle(
-                                color: _make
-                                    ? Color(0xff00c6ac)
-                                    : Color(0xff97c7c1),
-                                fontWeight: FontWeight.w600,
-                                fontFamily: "Poppins",
-                                fontSize: _make ? 28.0 : 26.0,
-                                shadows: [
-                                  if (_make)
-                                    Shadow(
-                                        color:
-                                            Color.fromRGBO(33, 175, 134, 0.5),
-                                        blurRadius: 8),
-                                ],
-                              ),
+                                  color: _make
+                                      ? Color(0xffdda8a8)
+                                      : Color(0xffda0000),
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: "Poppins",
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: _make ? 26.0 : 28.0,
+                                  shadows: [
+                                    if (!_make)
+                                      Shadow(
+                                          color: Color.fromRGBO(218, 0, 0, 0.5),
+                                          blurRadius: 8),
+                                  ]),
                               child: Text(
-                                "MAKE",
+                                "BREAK",
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(width: 78),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _make = false;
-                              _habitTitleController.text = "";
-                              _buttonColor = Palette.red;
-                              _reminder = false;
-                            });
-                          },
-                          child: AnimatedDefaultTextStyle(
-                            duration: Duration(milliseconds: 300),
-                            curve: Curves.easeOutCubic,
-                            style: TextStyle(
-                                color: _make
-                                    ? Color(0xffdda8a8)
-                                    : Color(0xffda0000),
-                                fontWeight: FontWeight.w600,
-                                fontFamily: "Poppins",
-                                fontStyle: FontStyle.normal,
-                                fontSize: _make ? 26.0 : 28.0,
-                                shadows: [
-                                  if (!_make)
-                                    Shadow(
-                                        color: Color.fromRGBO(218, 0, 0, 0.5),
-                                        blurRadius: 8),
-                                ]),
-                            child: Text(
-                              "BREAK",
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20.0, bottom: 5),
-                      child: Text(
-                        "Habit Title",
-                        style: Theme.of(context).textTheme.bodyText1,
+                        ],
                       ),
                     ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                        margin: const EdgeInsets.only(left: 15.5),
-                        width: 360,
-                        height: 40,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            border: Border.all(
-                                color: _make ? Palette.primary : Palette.red,
-                                width: 1),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: const Color(0x1a000000),
-                                  offset: Offset(1.2246467991473532e-16, 2),
-                                  blurRadius: 8,
-                                  spreadRadius: 0)
-                            ],
-                            color: Palette.white),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 8),
-                          child: TextField(
-                            controller: _habitTitleController,
-                            maxLength: 26,
-                            cursorColor: Palette.primary,
-                            cursorHeight: 13.5,
-                            cursorRadius: Radius.circular(15),
-                            autocorrect: false,
-                            style: const TextStyle(
-                                color: Palette.text,
-                                fontFamily: "OpenSans",
-                                fontSize: 13.5),
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              counterText: "",
-                            ),
-                          ),
-                        )),
-                  ),
-                  Container(
-                      margin: const EdgeInsets.only(top: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Column(
-                            children: [
-                              Text(
-                                "End Date",
-                                style: Theme.of(context).textTheme.bodyText1,
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 20.0, bottom: 5),
+                        child: Text(
+                          "Habit Title",
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                          margin: const EdgeInsets.only(left: 15.5),
+                          width: 360,
+                          height: 40,
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              border: Border.all(
+                                  color: _make ? Palette.primary : Palette.red,
+                                  width: 1),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: const Color(0x1a000000),
+                                    offset: Offset(1.2246467991473532e-16, 2),
+                                    blurRadius: 8,
+                                    spreadRadius: 0)
+                              ],
+                              color: Palette.white),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 8),
+                            child: TextField(
+                              controller: _habitTitleController,
+                              maxLength: 26,
+                              cursorColor: Palette.primary,
+                              cursorHeight: 13.5,
+                              cursorRadius: Radius.circular(15),
+                              autocorrect: false,
+                              style: const TextStyle(
+                                  color: Palette.text,
+                                  fontFamily: "OpenSans",
+                                  fontSize: 13.5),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                counterText: "",
                               ),
-                              SizedBox(height: 5),
-                              GestureDetector(
-                                onTap: () {
-                                  _selectDate(context, _endDate);
-                                },
-                                child: Container(
-                                  width: 110,
-                                  height: 27,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12),
-                                  decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(8)),
-                                      color: _make
-                                          ? Palette.primary
-                                          : Palette.red),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        DateFormat("dd/MM/yyyy")
-                                            .format(_endDate),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyText2,
-                                      ),
-                                      Spacer(),
-                                      GestureDetector(
-                                          onTap: () {},
-                                          child: Icon(
-                                            Icons.calendar_today,
-                                            size: 12,
-                                            color: Palette.white,
-                                          ))
-                                    ],
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                          if (_make)
-                            SizedBox(
-                              width: 50,
                             ),
-                          if (_make)
+                          )),
+                    ),
+                    Container(
+                        margin: const EdgeInsets.only(top: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
                             Column(
                               children: [
                                 Text(
-                                  "Practice Every",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      ?.copyWith(color: Palette.text),
+                                  "End Date",
+                                  style: Theme.of(context).textTheme.bodyText1,
                                 ),
                                 SizedBox(height: 5),
                                 GestureDetector(
-                                  onTap: () async {
-                                    await _selectHabitRepeat(context);
-                                    Future.delayed(Duration(milliseconds: 1))
-                                        .then((value) => setState(() {}));
+                                  onTap: () {
+                                    _selectDate(context, _endDate);
                                   },
                                   child: Container(
-                                    width: 100,
+                                    width: 115,
                                     height: 27,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12),
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(8)),
-                                        color: Palette.primary),
+                                        color: _make
+                                            ? Palette.primary
+                                            : Palette.red),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
                                       children: [
-                                        Icon(
-                                          CupertinoIcons.restart,
-                                          color: Palette.white,
-                                          size: 13,
-                                        ),
-                                        SizedBox(width: 6),
                                         Text(
-                                          _repeatController.text.isNotEmpty
-                                              ? _repeatController.text +
-                                                  " " +
-                                                  _repeatPeriod
-                                              : "2 days",
+                                          DateFormat("dd/MM/yyyy")
+                                              .format(_endDate),
                                           style: Theme.of(context)
                                               .textTheme
-                                              .bodyText2
-                                              ?.copyWith(color: Palette.white),
+                                              .bodyText2,
                                         ),
+                                        Spacer(),
+                                        GestureDetector(
+                                            onTap: () {},
+                                            child: Icon(
+                                              Icons.calendar_today,
+                                              size: 12,
+                                              color: Palette.white,
+                                            ))
                                       ],
                                     ),
                                   ),
-                                ),
+                                )
                               ],
                             ),
-                        ],
-                      )),
-                  Center(
-                    child: Container(
-                      margin: const EdgeInsets.only(top: 19.5),
-                      child: Column(children: [
-                        Text(
-                          "Remind Me",
-                          style: Theme.of(context).textTheme.bodyText1,
-                        ),
-                        Transform.scale(
-                          scale: 1.4,
-                          child: Checkbox(
-                            value: _reminder,
-                            onChanged: (val) {
-                              setState(() {
-                                _reminder = val!;
-                              });
-                            },
-                            splashRadius: 10,
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            activeColor: _make ? Palette.primary : Palette.red,
-                            side: BorderSide(
-                                width: 2,
-                                color: _make ? Palette.primary : Palette.red),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(
-                              Radius.circular(4.5),
-                            )),
-                          ),
-                        ),
-                      ]),
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
-        );
-      }),
+                            if (_make)
+                              SizedBox(
+                                width: 50,
+                              ),
+                            if (_make)
+                              Column(
+                                children: [
+                                  Text(
+                                    "Practice Every",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1
+                                        ?.copyWith(color: Palette.text),
+                                  ),
+                                  SizedBox(height: 5),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      await _selectHabitRepeat(context);
+                                      Future.delayed(Duration(milliseconds: 1))
+                                          .then((value) => setState(() {}));
+                                    },
+                                    child: Container(
+                                      width: 100,
+                                      height: 27,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(8)),
+                                          color: Palette.primary),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            CupertinoIcons.restart,
+                                            color: Palette.white,
+                                            size: 13,
+                                          ),
+                                          SizedBox(width: 6),
+                                          Text(
+                                            _repeatController.text.isNotEmpty
+                                                ? _repeatController.text +
+                                                    " " +
+                                                    _repeatPeriod
+                                                : "2 days",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyText2
+                                                ?.copyWith(
+                                                    color: Palette.white),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        )),
+                    // Center(
+                    //   child: Container(
+                    //     margin: const EdgeInsets.only(top: 19.5),
+                    //     child: Column(children: [
+                    //       Text(
+                    //         "Remind Me",
+                    //         style: Theme.of(context).textTheme.bodyText1,
+                    //       ),
+                    //       Transform.scale(
+                    //         scale: 1.4,
+                    //         child: Checkbox(
+                    //           value: _reminder,
+                    //           onChanged: (val) {
+                    //             setState(() {
+                    //               _reminder = val!;
+                    //             });
+                    //           },
+                    //           splashRadius: 10,
+                    //           materialTapTargetSize:
+                    //               MaterialTapTargetSize.shrinkWrap,
+                    //           activeColor:
+                    //               _make ? Palette.primary : Palette.red,
+                    //           side: BorderSide(
+                    //               width: 2,
+                    //               color: _make ? Palette.primary : Palette.red),
+                    //           shape: RoundedRectangleBorder(
+                    //               borderRadius: BorderRadius.all(
+                    //             Radius.circular(4.5),
+                    //           )),
+                    //         ),
+                    //       ),
+                    //     ]),
+                    //   ),
+                    // ),
+                  ],
+                )
+              ],
+            ),
+          );
+        }),
+      ),
     );
   }
 }
