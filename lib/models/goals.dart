@@ -5,10 +5,8 @@ class GoalList extends ChangeNotifier {
   List<Goal> _goals = [];
 
   void completeGoal(String key) {
-    // completeGoal
     _goals.removeWhere((goal) => goal.key == key);
     DatabaseHelper.removeGoal("Goals", key);
-    // check for milestnes!!!
   }
 
   void completeMilestone(String key, String parentKey) {
@@ -43,7 +41,8 @@ class GoalList extends ChangeNotifier {
           enddate: DateTime.parse(goal["enddate"]),
           reminder: goal["reminder"] == 0 ? false : true,
           repeat: goal["repeat"],
-          milestones: _goalMilestones);
+          milestones: _goalMilestones,
+          notificationId: goal["notificationId"]);
 
       finalGoal.sortAndNumberMilestones();
       _goals.add(finalGoal);
@@ -53,16 +52,15 @@ class GoalList extends ChangeNotifier {
 
   void addGoal(Goal goal) {
     // MAY CRASH IF MILESTONES + REPEATER ADDED
-    if (goal.repeat == -1) return;
     if (goal.repeat > 0) {
-      var j = 0;
+      var j = 0; // total num of goals
       DateTime date = DateTime.now();
       while (goal.enddate.isAfter(date)) {
         j++;
         date = date.add(Duration(days: goal.repeat));
       }
 
-      for (var i = 0; i < j; i++) {
+      for (int i = 0; i < j; i++) {
         final key = UniqueKey().toString();
         final enddate = DateTime(
                 DateTime.now().year, DateTime.now().month, DateTime.now().day)
@@ -76,7 +74,8 @@ class GoalList extends ChangeNotifier {
             milestones: goal.milestones,
             reminder: goal.reminder,
             repeat: goal.repeat,
-            enddate: enddate));
+            enddate: enddate,
+            notificationId: goal.notificationId));
         DatabaseHelper.insertGoal("Goals", {
           "id": key,
           "parentId": goal.key,
@@ -85,6 +84,7 @@ class GoalList extends ChangeNotifier {
           "reminder": goal.reminder ? 1 : 0,
           "repeat": goal.repeat,
           "enddate": enddate.toIso8601String(),
+          "notificationId": goal.notificationId,
         });
       }
       notifyListeners();
@@ -102,7 +102,7 @@ class GoalList extends ChangeNotifier {
 
     DatabaseHelper.insertGoal("Goals", {
       "id": goal.key,
-      "parentId": "not-recurring",
+      "parentId": "_",
       "title": goal.title,
       "desc": goal.desc,
       "reminder": goal.reminder ? 1 : 0,
@@ -158,6 +158,7 @@ class Goal {
   final List<Milestone> milestones;
   final int repeat; // in days
   final bool reminder;
+  String notificationId;
   String parentKey;
 
   Goal({
@@ -168,6 +169,7 @@ class Goal {
     required this.milestones,
     required this.repeat,
     required this.reminder,
+    required this.notificationId,
     this.parentKey = "not-recurring",
   });
 

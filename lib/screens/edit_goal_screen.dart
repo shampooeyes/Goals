@@ -243,6 +243,7 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
       repeat:
           _repeater ? _repeatMultiplier * int.parse(_repeatController.text) : 0,
       reminder: _reminder,
+      notificationId: "",
     ));
     Navigator.of(context).pop();
   }

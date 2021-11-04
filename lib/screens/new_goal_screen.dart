@@ -363,21 +363,22 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
       ));
       return;
     }
+    String? notificationId;
     if (_reminder) {
       final date = DateTime(_targetDate.year, _targetDate.month,
           _targetDate.day, _selectedTime.hour, _selectedTime.minute);
 
       final OSDeviceState? status = await OneSignal.shared.getDeviceState();
-
       if (status != null) {
         final playerId = status.userId;
-        OneSignal.shared.postNotificationWithJson({
+        final response = await OneSignal.shared.postNotificationWithJson({
           "app_id": "bbdc8751-01db-4011-b5c6-79c78b349bd6",
           "include_player_ids": [playerId],
           "contents": {"en": "Reminder: ${_titleController.text.trim()}"},
           "delayed_option": "timezone",
           "delivery_time_of_day": date.toIso8601String(),
         });
+        notificationId = response["id"];
       }
     }
     Provider.of<GoalList>(context, listen: false).addGoal(Goal(
@@ -389,6 +390,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
       repeat:
           _repeater ? _repeatMultiplier * int.parse(_repeatController.text) : 0,
       reminder: _reminder,
+      notificationId: notificationId ?? "",
     ));
     Navigator.of(context).pop(_targetDate);
   }
@@ -518,7 +520,6 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
             ),
           ),
           body: TabBarView(
-            physics: NeverScrollableScrollPhysics(),
             children: [
               SingleChildScrollView(
                 child: Column(
@@ -762,71 +763,71 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                               )
                             ],
                           ),
-                          SizedBox(
-                            width: 50,
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                "Repeat",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyText1
-                                    ?.copyWith(
-                                        color: _repeater
-                                            ? Palette.text
-                                            : Color(0xff989898)),
-                              ),
-                              SizedBox(height: 5),
-                              GestureDetector(
-                                onTap: () async {
-                                  await _selectRepeat(context);
-                                  Future.delayed(Duration(milliseconds: 1))
-                                      .then((value) => setState(() {}));
-                                  if (_repeatController.text.isEmpty) {
-                                    setState(() => _repeater = false);
-                                  }
-                                },
-                                child: Container(
-                                  width: 100,
-                                  height: 27,
-                                  decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(8)),
-                                      color: _repeater
-                                          ? Palette.primary
-                                          : Palette.milestone),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        CupertinoIcons.restart,
-                                        color: _repeater
-                                            ? Palette.white
-                                            : Color(0xff989898),
-                                        size: 13,
-                                      ),
-                                      SizedBox(width: 6),
-                                      Text(
-                                        _repeater
-                                            ? _repeatController.text +
-                                                " " +
-                                                _repeatPeriod
-                                            : "2 days",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyText2
-                                            ?.copyWith(
-                                                color: _repeater
-                                                    ? Palette.white
-                                                    : Color(0xff989898)),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
+                          // SizedBox(
+                          //   width: 50,
+                          // ),
+                          // Column(
+                          //   children: [
+                          //     Text(
+                          //       "Repeat",
+                          //       style: Theme.of(context)
+                          //           .textTheme
+                          //           .bodyText1
+                          //           ?.copyWith(
+                          //               color: _repeater
+                          //                   ? Palette.text
+                          //                   : Color(0xff989898)),
+                          //     ),
+                          //     SizedBox(height: 5),
+                          //     GestureDetector(
+                          //       onTap: () async {
+                          //         await _selectRepeat(context);
+                          //         Future.delayed(Duration(milliseconds: 1))
+                          //             .then((value) => setState(() {}));
+                          //         if (_repeatController.text.isEmpty) {
+                          //           setState(() => _repeater = false);
+                          //         }
+                          //       },
+                          //       child: Container(
+                          //         width: 100,
+                          //         height: 27,
+                          //         decoration: BoxDecoration(
+                          //             borderRadius:
+                          //                 BorderRadius.all(Radius.circular(8)),
+                          //             color: _repeater
+                          //                 ? Palette.primary
+                          //                 : Palette.milestone),
+                          //         child: Row(
+                          //           mainAxisAlignment: MainAxisAlignment.center,
+                          //           children: [
+                          //             Icon(
+                          //               CupertinoIcons.restart,
+                          //               color: _repeater
+                          //                   ? Palette.white
+                          //                   : Color(0xff989898),
+                          //               size: 13,
+                          //             ),
+                          //             SizedBox(width: 6),
+                          //             Text(
+                          //               _repeater
+                          //                   ? _repeatController.text +
+                          //                       " " +
+                          //                       _repeatPeriod
+                          //                   : "2 days",
+                          //               style: Theme.of(context)
+                          //                   .textTheme
+                          //                   .bodyText2
+                          //                   ?.copyWith(
+                          //                       color: _repeater
+                          //                           ? Palette.white
+                          //                           : Color(0xff989898)),
+                          //             ),
+                          //           ],
+                          //         ),
+                          //       ),
+                          //     )
+                          //   ],
+                          // ),
                         ],
                       ),
                     ),

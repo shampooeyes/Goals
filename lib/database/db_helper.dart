@@ -8,7 +8,7 @@ class DatabaseHelper {
       final goalDb = await sql.openDatabase(path.join(dbPath, 'goals.db'),
           onCreate: (db, version) async {
         await db.execute(
-            'CREATE TABLE Goals(id TEXT PRIMARY KEY, parentId TEXT, title TEXT, desc TEXT, enddate TEXT, reminder INTEGER, repeat INTEGER)');
+            'CREATE TABLE Goals(id TEXT PRIMARY KEY, parentId TEXT, title TEXT, desc TEXT, enddate TEXT, reminder INTEGER, repeat INTEGER, notificationId TEXT)');
       }, version: 1);
       goalDb.insert(
         table,
@@ -67,7 +67,7 @@ class DatabaseHelper {
     final dbPath = await sql.getDatabasesPath();
     final eventsDb = await sql.openDatabase(path.join(dbPath, "events.db"),
         onCreate: (db, version) =>
-            db.execute("CREATE TABLE Events(id TEXT PRIMARY KEY, dates TEXT"),
+            db.execute("CREATE TABLE Events(id TEXT PRIMARY KEY, dates TEXT)"),
         version: 1);
     eventsDb.insert("Events", data);
   }
@@ -76,7 +76,7 @@ class DatabaseHelper {
     final dbPath = await sql.getDatabasesPath();
     final eventsDb = await sql.openDatabase(path.join(dbPath, "events.db"),
         onCreate: (db, version) =>
-            db.execute("CREATE TABLE Events(id TEXT PRIMARY KEY, dates TEXT"),
+            db.execute("CREATE TABLE Events(id TEXT PRIMARY KEY, dates TEXT)"),
         version: 1);
     eventsDb.update("Events", data,where: "id = ?", whereArgs: [id]);
   }
@@ -86,7 +86,7 @@ class DatabaseHelper {
     final dbPath = await sql.getDatabasesPath();
     final eventsDb = await sql.openDatabase(path.join(dbPath, "events.db"),
         onCreate: (db, version) =>
-            db.execute("CREATE TABLE Events(id TEXT PRIMARY KEY, dates TEXT"),
+            db.execute("CREATE TABLE Events(id TEXT PRIMARY KEY, dates TEXT)"),
         version: 1);
     return eventsDb.query("Events");
   }
@@ -118,7 +118,7 @@ class DatabaseHelper {
     final goalDb = await sql.openDatabase(path.join(dbPath, "goals.db"),
         onCreate: (db, version) {
       return db.execute(
-          "CREATE TABLE Goals(id TEXT PRIMARY KEY, parentId TEXT, title TEXT, desc TEXT, enddate TEXT, reminder INTEGER, repeat INTEGER)");
+          "CREATE TABLE Goals(id TEXT PRIMARY KEY, parentId TEXT, title TEXT, desc TEXT, enddate TEXT, reminder INTEGER, repeat INTEGER, notificationId TEXT)");
     }, version: 1);
     return goalDb.query("Goals");
   }

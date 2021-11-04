@@ -25,12 +25,16 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
   @override
   void initState() {
     _totalEvents = widget.habit.events;
+    widget.habit.events.forEach((key, value) {
+      print(value[0].done);
+    });
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsfromDay(_selectedDay!));
     super.initState();
   }
 
   List<Event> _getEventsfromDay(DateTime date) {
+    // print(DateTime(date.year, date.month, date.day));
     return _totalEvents[DateTime(date.year, date.month, date.day)] ?? [];
   }
 
@@ -155,6 +159,24 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
                         itemCount: value.length,
                         itemBuilder: (ctx, index) {
                           final event = value[index];
+                          if (event.date.isAfter(DateTime.now()))
+                            return Container(
+                              alignment: Alignment.center,
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 15, vertical: 10),
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Palette.milestone,
+                                border: Border.all(color: Color(0xff989898)),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Text(
+                                "Done",
+                                style: TextStyle(
+                                    color: Color(0xff989898),
+                                    fontSize: 16),
+                              ),
+                            );
                           return GestureDetector(
                             onTap: () {
                               setState(() {

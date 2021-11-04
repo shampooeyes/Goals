@@ -17,7 +17,9 @@ class HabitList extends ChangeNotifier {
       "repeat": habit.repeat,
       "reminder": habit.reminder ? 1 : 0,
       "enddate": habit.enddate.toIso8601String(),
-      "creationDate": habit.creationDate.toIso8601String(),
+      "creationDate": DateTime(habit.creationDate.year,
+              habit.creationDate.month, habit.creationDate.day)
+          .toIso8601String(),
     });
     DatabaseHelper.insertHabitsEvents({
       "id": habit.key,
@@ -43,7 +45,8 @@ class HabitList extends ChangeNotifier {
 
     habit.bestStreak = (bestStrk * habit.repeat) - 1;
     dates = dates.reversed.toList();
-    counter = -1;
+    dates.retainWhere((element) => element.isBefore(DateTime.now()));
+    counter = 0;
     int daysAtEnd = 0;
     for (int i = 0; i < dates.length; i++) {
       DateTime date = dates[i];
@@ -52,6 +55,7 @@ class HabitList extends ChangeNotifier {
         DateTime tod = DateTime.now();
         daysAtEnd =
             DateTime(tod.year, tod.month, tod.day).difference(date).inDays;
+        print(daysAtEnd);
       }
 
       if (!habit.events[date]![0].done) {
@@ -60,7 +64,8 @@ class HabitList extends ChangeNotifier {
         counter++;
       }
     }
-    habit.currentStreak = (counter * habit.repeat) + daysAtEnd;
+    habit.currentStreak =
+        counter == 0 ? 0 : ((counter - 1) * habit.repeat) + daysAtEnd;
     habit.bestStreak = max(habit.bestStreak, habit.currentStreak);
     notifyListeners();
     DatabaseHelper.updateHabitsEvents(
@@ -78,13 +83,44 @@ class HabitList extends ChangeNotifier {
   }
 
   void setStreaks() {
-    // calculate last start date till now
-    DateTime now = DateTime.now();
-
     _habits.forEach((habit) {
-      int difference = now.difference(habit.creationDate).inDays;
-      habit.currentStreak = difference;
-      if (difference > habit.bestStreak) habit.bestStreak = difference;
+      int bestStrk = 0;
+      int counter = 0;
+      List<DateTime> dates = [];
+      habit.events.forEach((date, list) {
+        dates.add(date);
+        if (list[0].done) {
+          counter++;
+        } else {
+          bestStrk = max(counter, bestStrk);
+          counter = 0;
+        }
+      });
+
+      habit.bestStreak = (bestStrk * habit.repeat) - 1;
+      dates = dates.reversed.toList();
+      dates.retainWhere((element) => element.isBefore(DateTime.now()));
+      counter = 0;
+      int daysAtEnd = 0;
+      for (int i = 0; i < dates.length; i++) {
+        DateTime date = dates[i];
+
+        if (i == 0 && habit.events[date]![0].done) {
+          DateTime tod = DateTime.now();
+          daysAtEnd =
+              DateTime(tod.year, tod.month, tod.day).difference(date).inDays;
+          print(daysAtEnd);
+        }
+
+        if (!habit.events[date]![0].done) {
+          break;
+        } else {
+          counter++;
+        }
+      }
+      habit.currentStreak =
+          counter == 0 ? 0 : ((counter - 1) * habit.repeat) + daysAtEnd;
+      habit.bestStreak = max(habit.bestStreak, habit.currentStreak);
     });
 
     notifyListeners();
@@ -101,34 +137,48 @@ class HabitList extends ChangeNotifier {
       final event = habitEvents.firstWhere((element) =>
           element["id"] == habit["id"]); // {id: "id", dates: "date1 date2"}
 
-      var events = {};
+      Map<DateTime, List<Event>> events = {};
       String doneDates = event["dates"] as String;
+      // print(doneDates);
       List<DateTime> doneDatesList = [];
+
       doneDates.split(" ").forEach((string) {
-        doneDatesList.add(DateTime.parse(string));
+        if (string.trim().isNotEmpty) doneDatesList.add(DateTime.parse(string));
       });
 
-      DateTime date = habit["creationDate"];
-      while (date.isBefore(habit["enddate"])) {
+      DateTime date = DateTime.parse(habit["creationDate"]);
+      while (date.isBefore(DateTime.parse(habit["enddate"]))) {
         events.update(DateTime(date.year, date.month, date.day), (_) {
-          return [Event(done: false)]; //find where date == date in doneDatesList and set event to true
-        }, ifAbsent: () => [Event(done: false)]);
-        date = date.add(Duration(days: habit["make"] ? habit["repeat"] : 1));
+          bool dateDone =
+              doneDatesList.remove(DateTime(date.year, date.month, date.day));
+          return [
+            Event(done: dateDone,date: DateTime(date.year, date.month, date.day))
+          ]; //find where date == date in doneDatesList and set event to true
+        }, ifAbsent: () {
+          bool dateDone =
+              doneDatesList.remove(DateTime(date.year, date.month, date.day));
+          return [
+            Event(done: dateDone,date: DateTime(date.year, date.month, date.day))
+          ]; //find where date == date in doneDatesList and set event to true
+        });
+        date =
+            date.add(Duration(days: habit["make"] == 1 ? habit["repeat"] : 1));
       }
 
       return Habit(
-          key: habit["id"],
-          make: habit["make"] == 0 ? false : true,
-          title: habit["title"],
-          enddate: DateTime.parse(habit["enddate"]),
-          creationDate: DateTime.parse(habit["creationDate"]),
-          repeat: habit["repeat"],
-          reminder: habit["reminder"] == 0 ? false : true,
-          events: {}
+        key: habit["id"],
+        make: habit["make"] == 0 ? false : true,
+        title: habit["title"],
+        enddate: DateTime.parse(habit["enddate"]),
+        creationDate: DateTime.parse(habit["creationDate"]),
+        repeat: habit["repeat"],
+        reminder: habit["reminder"] == 0 ? false : true,
+        events: events,
 
-          ///fetch
-          );
+        ///fetch
+      );
     }).toList();
+    notifyListeners();
   }
 }
 
@@ -158,8 +208,8 @@ class Habit {
       DateTime date = creationDate;
       while (date.isBefore(enddate)) {
         events.update(DateTime(date.year, date.month, date.day),
-            (_) => [Event(done: false)],
-            ifAbsent: () => [Event(done: false)]);
+            (_) => [Event(done: false,date: DateTime(date.year, date.month, date.day))],
+            ifAbsent: () => [Event(done: false,date: DateTime(date.year, date.month, date.day))]);
         date = date.add(Duration(days: make ? repeat : 1));
       }
     }

@@ -189,26 +189,22 @@ class _GoalsScreenState extends State<GoalsScreen> {
             Navigator.of(context).pushNamed(HistoryScreen.routeName);
           },
           icon: Icon(Icons.history, size: 30),
+        ),
+        IconButton(
+          onPressed: () async {
+            final response =
+                await Navigator.of(context).pushNamed(NewGoalScreen.routeName);
+            if (response != null)
+              setState(() {
+                selectedDate = response as DateTime;
+              });
+          },
+          icon: Icon(CupertinoIcons.add, size: 30),
         )
       ],
     );
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final response =
-              await Navigator.of(context).pushNamed(NewGoalScreen.routeName);
-          if (response != null)
-            setState(() {
-              selectedDate = response as DateTime;
-            });
-        },
-        backgroundColor: Palette.secondary,
-        child: Icon(
-          CupertinoIcons.add,
-          size: 30,
-        ),
-      ),
       appBar: appBar,
       body: Stack(children: [
         Column(
@@ -227,8 +223,18 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 return Container(
                     height: 100,
                     alignment: Alignment.center,
-                    child: Image.asset(
-                      "assets/images/bearhabits.png",
+                    child: GestureDetector(
+                      onTap: () async {
+                        final response = await Navigator.of(context)
+                            .pushNamed(NewGoalScreen.routeName);
+                        if (response != null)
+                          setState(() {
+                            selectedDate = response as DateTime;
+                          });
+                      },
+                      child: Image.asset(
+                        "assets/images/bearhabits.png",
+                      ),
                     ));
               return Container(
                 margin: const EdgeInsets.only(left: 5),
@@ -267,7 +273,16 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     return Container(
                         alignment: Alignment.center,
                         height: 200,
-                        child: Image.asset("assets/images/beargoals.png"));
+                        child: GestureDetector(
+                            onTap: () async {
+                              final response = await Navigator.of(context)
+                                  .pushNamed(NewGoalScreen.routeName);
+                              if (response != null)
+                                setState(() {
+                                  selectedDate = response as DateTime;
+                                });
+                            },
+                            child: Image.asset("assets/images/beargoals.png")));
 
                   final _listKey = GlobalKey<AnimatedListState>();
                   final finalGoals = [...goals];
@@ -361,9 +376,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                               milestoneNumber: isGoal
                                                   ? ""
                                                   : "${goal.milestoneNumber}/${associatedGoal.milestones.length}",
-                                              // repeat: goal.repeat == 0
-                                              //     ? false
-                                              //     : true,
+                                              repeat: goal.repeat == 0
+                                                  ? false
+                                                  : true,
                                               reminder: associatedGoal.reminder,
                                             ),
                                           ),
@@ -381,6 +396,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                 return GoalTile(
                                   key: ValueKey(tiles[index].key),
                                   goalKey: tiles[index].key,
+                                  parentKey: tiles[index].parentKey,
                                   title: tiles[index].title,
                                   desc: tiles[index].desc,
                                   goal: true,
@@ -390,6 +406,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                   reminder: tiles[index].reminder,
                                   helper: removeItem,
                                   playConfetti: playConfetti,
+                                  notificationId: tiles[index].notificationId,
                                 );
                               }
                               Goal associatedGoal = snapshot
@@ -415,6 +432,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                 reminder: associatedGoal.reminder,
                                 helper: removeItem,
                                 playConfetti: playConfetti,
+                                notificationId: "",
                               );
                             }),
                       ),
