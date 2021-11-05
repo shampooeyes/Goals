@@ -207,200 +207,245 @@ class _GoalsScreenState extends State<GoalsScreen> {
     return Scaffold(
       appBar: appBar,
       body: Stack(children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(left: 22, right: 19, top: 12),
-              child: Text(
-                "Habits",
-                style: Theme.of(context).textTheme.headline1,
-              ),
-            ),
-            Consumer<HabitList>(builder: (context, snapshot, child) {
-              final _habits = snapshot.getHabits();
-              if (_habits.isEmpty)
-                return Container(
-                    height: 133,
-                    alignment: Alignment.center,
-                    child: GestureDetector(
-                      onTap: () async {
-                        final response = await Navigator.of(context)
-                            .pushNamed(NewGoalScreen.routeName);
-                        if (response != null)
-                          setState(() {
-                            selectedDate = response as DateTime;
-                          });
-                      },
-                      child: Container(
-                        height: 100,
-                        child: Image.asset(
-                          "assets/images/bearhabits.png",
-                        ),
-                      ),
-                    ));
-              return Container(
-                margin: const EdgeInsets.only(left: 5),
-                constraints: BoxConstraints(maxHeight: 122),
-                child: ListView.builder(
-                  physics: BouncingScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  shrinkWrap: true,
-                  itemCount: _habits.length,
-                  itemBuilder: (ctx, index) => GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (ctx) =>
-                                HabitDetailsScreen(_habits[index])));
-                      },
-                      child: HabitTile(_habits[index])),
+        SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(left: 22, right: 19, top: 12),
+                child: Text(
+                  "Habits",
+                  style: Theme.of(context).textTheme.headline1,
                 ),
-              );
-            }),
-            Container(
-              margin: const EdgeInsets.only(left: 22, right: 19, bottom: 8),
-              child: Text(
-                "Goals",
-                style: Theme.of(context).textTheme.headline1,
               ),
-            ),
-            Consumer<GoalList>(
-              builder: (ctx, snapshot, child) {
-                List goals = snapshot.getGoals();
-                final dates = snapshot.getDates();
-
-                return StatefulBuilder(
-                    builder: (BuildContext ctx, StateSetter setState) {
-                  //
-                  if (goals.isEmpty)
-                    return Container(
-                        alignment: Alignment.center,
-                        height: 200,
-                        child: GestureDetector(
-                            onTap: () async {
-                              final response = await Navigator.of(context)
-                                  .pushNamed(NewGoalScreen.routeName);
-                              if (response != null)
-                                setState(() {
-                                  selectedDate = response as DateTime;
-                                });
-                            },
-                            child: Image.asset("assets/images/beargoals.png")));
-
-                  final _listKey = GlobalKey<AnimatedListState>();
-                  final finalGoals = [...goals];
-                  List<Milestone> milestones = [];
-
-                  finalGoals.forEach((goal) {
-                    if (goal.milestones.length != 0)
-                      goal.milestones
-                          .forEach((milestone) => milestones.add(milestone));
-                  });
-
-                  finalGoals
-                      .retainWhere((goal) => goal.enddate == selectedDate);
-
-                  milestones.retainWhere(
-                      (milestone) => milestone.enddate == selectedDate);
-
-                  final tiles = [...finalGoals, ...milestones];
-
-                  return Column(
-                    children: [
-                      // Dates Row
-                      Container(
-                        width: MediaQuery.of(context).size.width - 21,
-                        height: 26,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.only(left: 5),
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: dates.length,
-                          itemBuilder: (ctx, index) {
-                            final isSelected = selectedDate == dates[index];
-                            return GestureDetector(
-                              onTap: () {
-                                if (!isSelected) {
-                                  setState(() {
-                                    selectedDate = dates[index];
-                                    snapshot.notifyAllListeners();
-                                  });
-                                }
-                              },
-                              child: DateChip(
-                                  DateFormat("d MMM")
-                                      .format(dates[index])
-                                      .toUpperCase(),
-                                  isSelected),
-                            );
-                          },
+              Consumer<HabitList>(builder: (context, snapshot, child) {
+                final _habits = snapshot.getHabits();
+                if (_habits.isEmpty)
+                  return Container(
+                      height: 133,
+                      alignment: Alignment.center,
+                      child: GestureDetector(
+                        onTap: () async {
+                          final response = await Navigator.of(context)
+                              .pushNamed(NewGoalScreen.routeName);
+                          if (response != null)
+                            setState(() {
+                              selectedDate = response as DateTime;
+                            });
+                        },
+                        child: Container(
+                          height: 100,
+                          child: Image.asset(
+                            "assets/images/bearhabits.png",
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                        // top margin
-                        height: MediaQuery.of(context).size.height -
-                            MediaQuery.of(context).padding.top -
-                            appBar.preferredSize.height -
-                            267,
-                        child: AnimatedList(
-                            // extract to goal tile
-                            key: _listKey,
-                            shrinkWrap: true,
-                            // padding: const EdgeInsets.symmetric(horizontal: 15),
-                            physics: BouncingScrollPhysics(),
-                            initialItemCount: tiles.length,
-                            itemBuilder:
-                                (ctx, index, Animation<double> animation) {
-                              final bool isGoal =
-                                  tiles[index].runtimeType == Goal;
+                      ));
+                return Container(
+                  margin: const EdgeInsets.only(left: 5),
+                  constraints: BoxConstraints(maxHeight: 122),
+                  child: ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: _habits.length,
+                    itemBuilder: (ctx, index) => GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (ctx) =>
+                                  HabitDetailsScreen(_habits[index])));
+                        },
+                        child: HabitTile(_habits[index])),
+                  ),
+                );
+              }),
+              Container(
+                margin: const EdgeInsets.only(left: 22, right: 19, bottom: 8),
+                child: Text(
+                  "Goals",
+                  style: Theme.of(context).textTheme.headline1,
+                ),
+              ),
+              Consumer<GoalList>(
+                builder: (ctx, snapshot, child) {
+                  List goals = snapshot.getGoals();
+                  final dates = snapshot.getDates();
 
-                              void removeItem(Key key, var goal,
-                                  Goal associatedGoal, bool dismissed) {
-                                if (!dismissed)
-                                  _listKey.currentState!.removeItem(
-                                      index,
-                                      (context, animation) => SlideTransition(
-                                            position: animation.drive(Tween(
-                                                    begin: Offset(-0.5, 0),
-                                                    end: Offset(0, 0))
-                                                .chain(CurveTween(
-                                                    curve: Curves
-                                                        .easeInOutCubic))),
-                                            child: FadeTransition(
-                                              opacity: animation,
-                                              child: GoalTileCopy(
-                                                title: associatedGoal.title,
-                                                desc: isGoal
-                                                    ? goal.desc
-                                                    : goal.title,
-                                                isGoal: isGoal,
-                                                milestoneNumber: isGoal
-                                                    ? ""
-                                                    : "${goal.milestoneNumber}/${associatedGoal.milestones.length}",
-                                                repeat: goal.repeat == 0
-                                                    ? false
-                                                    : true,
-                                                reminder:
-                                                    associatedGoal.reminder,
+                  return StatefulBuilder(
+                      builder: (BuildContext ctx, StateSetter setState) {
+                    //
+                    if (goals.isEmpty)
+                      return Container(
+                          alignment: Alignment.center,
+                          height: 200,
+                          child: GestureDetector(
+                              onTap: () async {
+                                final response = await Navigator.of(context)
+                                    .pushNamed(NewGoalScreen.routeName);
+                                if (response != null)
+                                  setState(() {
+                                    selectedDate = response as DateTime;
+                                  });
+                              },
+                              child:
+                                  Image.asset("assets/images/beargoals.png")));
+
+                    final _listKey = GlobalKey<AnimatedListState>();
+                    final finalGoals = [...goals];
+                    List<Milestone> milestones = [];
+
+                    finalGoals.forEach((goal) {
+                      if (goal.milestones.length != 0)
+                        goal.milestones
+                            .forEach((milestone) => milestones.add(milestone));
+                    });
+
+                    finalGoals
+                        .retainWhere((goal) => goal.enddate == selectedDate);
+
+                    milestones.retainWhere(
+                        (milestone) => milestone.enddate == selectedDate);
+
+                    final tiles = [...finalGoals, ...milestones];
+
+                    return Column(
+                      children: [
+                        // Dates Row
+                        Container(
+                          width: MediaQuery.of(context).size.width - 21,
+                          height: 26,
+                          child: ListView.builder(
+                            padding: const EdgeInsets.only(left: 5),
+                            shrinkWrap: true,
+                            scrollDirection: Axis.horizontal,
+                            itemCount: dates.length,
+                            itemBuilder: (ctx, index) {
+                              final isSelected = selectedDate == dates[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  if (!isSelected) {
+                                    setState(() {
+                                      selectedDate = dates[index];
+                                      snapshot.notifyAllListeners();
+                                    });
+                                  }
+                                },
+                                child: DateChip(
+                                    DateFormat("d MMM")
+                                        .format(dates[index])
+                                        .toUpperCase(),
+                                    isSelected),
+                              );
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          // top margin
+                          // height: MediaQuery.of(context).size.height -
+                          //     MediaQuery.of(context).padding.top -
+                          //     appBar.preferredSize.height -
+                          //     267,
+                          child: AnimatedList(
+
+                              // extract to goal tile
+                              key: _listKey,
+                              shrinkWrap: true,
+                              // padding: const EdgeInsets.symmetric(horizontal: 15),
+                              physics: BouncingScrollPhysics(),
+                              initialItemCount: tiles.length,
+                              itemBuilder:
+                                  (ctx, index, Animation<double> animation) {
+                                final bool isGoal =
+                                    tiles[index].runtimeType == Goal;
+
+                                void removeItem(Key key, var goal,
+                                    Goal associatedGoal, bool dismissed) {
+                                  if (!dismissed)
+                                    _listKey.currentState!.removeItem(
+                                        index,
+                                        (context, animation) => SlideTransition(
+                                              position: animation.drive(Tween(
+                                                      begin: Offset(-0.5, 0),
+                                                      end: Offset(0, 0))
+                                                  .chain(CurveTween(
+                                                      curve: Curves
+                                                          .easeInOutCubic))),
+                                              child: FadeTransition(
+                                                opacity: animation,
+                                                child: GoalTileCopy(
+                                                  title: associatedGoal.title,
+                                                  desc: isGoal
+                                                      ? goal.desc
+                                                      : goal.title,
+                                                  isGoal: isGoal,
+                                                  milestoneNumber: isGoal
+                                                      ? ""
+                                                      : "${goal.milestoneNumber}/${associatedGoal.milestones.length}",
+                                                  repeat: goal.repeat == 0
+                                                      ? false
+                                                      : true,
+                                                  reminder:
+                                                      associatedGoal.reminder,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                      duration: Duration(milliseconds: 350));
-                                else
-                                  _listKey.currentState!.removeItem(index,
-                                      (context, animation) => Container());
-                                tiles.removeAt(index);
+                                        duration: Duration(milliseconds: 350));
+                                  else
+                                    _listKey.currentState!.removeItem(index,
+                                        (context, animation) => Container());
+                                  tiles.removeAt(index);
 
-                                isGoal
-                                    ? snapshot.completeGoal(goal.key)
-                                    : snapshot.completeMilestone(
-                                        goal.key, goal.parentKey);
-                              }
+                                  isGoal
+                                      ? snapshot.completeGoal(goal.key)
+                                      : snapshot.completeMilestone(
+                                          goal.key, goal.parentKey);
+                                }
 
-                              if (tiles[index].runtimeType == Goal) {
+                                if (tiles[index].runtimeType == Goal) {
+                                  return Container(
+                                    margin: const EdgeInsets.only(
+                                        bottom: 10, left: 15, right: 15),
+                                    decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(
+                                            color: const Color(0x2a000000),
+                                            offset: Offset(
+                                                1.2246467991473532e-16, 2),
+                                            blurRadius: 6,
+                                            spreadRadius: 0)
+                                      ],
+                                    ),
+                                    child: GoalTile(
+                                      key: ValueKey(tiles[index].key),
+                                      goalKey: tiles[index].key,
+                                      parentKey: tiles[index].parentKey,
+                                      title: tiles[index].title,
+                                      desc: tiles[index].desc,
+                                      goal: true,
+                                      milestoneNumber: "",
+                                      repeat: tiles[index].repeat == 0
+                                          ? false
+                                          : true,
+                                      reminder: tiles[index].reminder,
+                                      helper: removeItem,
+                                      playConfetti: playConfetti,
+                                      notificationId:
+                                          tiles[index].notificationId,
+                                    ),
+                                  );
+                                }
+                                Goal associatedGoal = snapshot
+                                    .getGoals()
+                                    .firstWhere((goal) =>
+                                        goal.key == tiles[index].parentKey);
+
+                                int totalMilestones =
+                                    associatedGoal.milestones.length;
+                                int milestoneNumber =
+                                    tiles[index].milestoneNumber;
+
                                 return Container(
                                   margin: const EdgeInsets.only(
                                       bottom: 10, left: 15, right: 15),
@@ -415,69 +460,30 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                     ],
                                   ),
                                   child: GoalTile(
-                                    key: ValueKey(tiles[index].key),
+                                    key: UniqueKey(),
                                     goalKey: tiles[index].key,
                                     parentKey: tiles[index].parentKey,
-                                    title: tiles[index].title,
-                                    desc: tiles[index].desc,
-                                    goal: true,
-                                    milestoneNumber: "",
-                                    repeat:
-                                        tiles[index].repeat == 0 ? false : true,
-                                    reminder: tiles[index].reminder,
+                                    title: associatedGoal.title,
+                                    desc: tiles[index].title,
+                                    goal: false,
+                                    milestoneNumber:
+                                        "$milestoneNumber/$totalMilestones",
+                                    repeat: false,
+                                    reminder: associatedGoal.reminder,
                                     helper: removeItem,
                                     playConfetti: playConfetti,
-                                    notificationId: tiles[index].notificationId,
+                                    notificationId: "",
                                   ),
                                 );
-                              }
-                              Goal associatedGoal = snapshot
-                                  .getGoals()
-                                  .firstWhere((goal) =>
-                                      goal.key == tiles[index].parentKey);
-
-                              int totalMilestones =
-                                  associatedGoal.milestones.length;
-                              int milestoneNumber =
-                                  tiles[index].milestoneNumber;
-
-                              return Container(
-                                margin: const EdgeInsets.only(
-                                    bottom: 10, left: 15, right: 15),
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: const Color(0x2a000000),
-                                        offset:
-                                            Offset(1.2246467991473532e-16, 2),
-                                        blurRadius: 6,
-                                        spreadRadius: 0)
-                                  ],
-                                ),
-                                child: GoalTile(
-                                  key: UniqueKey(),
-                                  goalKey: tiles[index].key,
-                                  parentKey: tiles[index].parentKey,
-                                  title: associatedGoal.title,
-                                  desc: tiles[index].title,
-                                  goal: false,
-                                  milestoneNumber:
-                                      "$milestoneNumber/$totalMilestones",
-                                  repeat: false,
-                                  reminder: associatedGoal.reminder,
-                                  helper: removeItem,
-                                  playConfetti: playConfetti,
-                                  notificationId: "",
-                                ),
-                              );
-                            }),
-                      ),
-                    ],
-                  );
-                });
-              },
-            ),
-          ],
+                              }),
+                        ),
+                      ],
+                    );
+                  });
+                },
+              ),
+            ],
+          ),
         ),
         animations[random]
       ]),
