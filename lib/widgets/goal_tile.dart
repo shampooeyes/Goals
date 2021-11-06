@@ -44,41 +44,41 @@ class GoalTile extends StatefulWidget {
 class _GoalTileState extends State<GoalTile> {
   bool isFinished = false;
 
-  Future<bool> confirmDelete(String title) async {
-    bool result = false;
-    await showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-              title: Text("Are you sure?"),
-              content: Text("Delete \"$title\""),
-              actions: [
-                TextButton(
-                    onPressed: Navigator.of(context).pop,
-                    child: Text(
-                      "Cancel",
-                      style: const TextStyle(
-                        fontFamily: "OpenSans",
-                        fontSize: 17,
-                        color: Color(0xff303030),
-                      ),
-                    )),
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      result = true;
-                    },
-                    child: Text(
-                      "OK",
-                      style: const TextStyle(
-                        fontFamily: "OpenSans",
-                        fontSize: 17,
-                        color: Color(0xff303030),
-                      ),
-                    ))
-              ],
-            ));
-    return result;
-  }
+  // Future<bool> confirmDelete(String title) async {
+  //   bool result = false;
+  //   await showDialog(
+  //       context: context,
+  //       builder: (ctx) => AlertDialog(
+  //             title: Text("Are you sure?"),
+  //             content: Text("Delete \"$title\""),
+  //             actions: [
+  //               TextButton(
+  //                   onPressed: Navigator.of(context).pop,
+  //                   child: Text(
+  //                     "Cancel",
+  //                     style: const TextStyle(
+  //                       fontFamily: "OpenSans",
+  //                       fontSize: 17,
+  //                       color: Color(0xff303030),
+  //                     ),
+  //                   )),
+  //               TextButton(
+  //                   onPressed: () {
+  //                     Navigator.of(context).pop();
+  //                     result = true;
+  //                   },
+  //                   child: Text(
+  //                     "OK",
+  //                     style: const TextStyle(
+  //                       fontFamily: "OpenSans",
+  //                       fontSize: 17,
+  //                       color: Color(0xff303030),
+  //                     ),
+  //                   ))
+  //             ],
+  //           ));
+  //   return result;
+  // }
 
   void _completeGoal(BuildContext context, bool dismissed, bool delete) {
     final goalProvider = Provider.of<GoalList>(context, listen: false);
@@ -148,14 +148,14 @@ class _GoalTileState extends State<GoalTile> {
           else // confirm delete
             _completeGoal(context, true, true);
         },
-        confirmDismiss: (dir) async {
-          if (dir == DismissDirection.endToStart)
-            return true;
-          else {
-            bool result = await confirmDelete(widget.title);
-            return result;
-          }
-        },
+        // confirmDismiss: (dir) async {
+        //   if (dir == DismissDirection.endToStart)
+        //     return true;
+        //   else {
+        //     bool result = await confirmDelete(widget.title);
+        //     return result;
+        //   }
+        // },
         background: Container(
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.only(left: 15),
