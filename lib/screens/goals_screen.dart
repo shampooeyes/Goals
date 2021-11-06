@@ -181,15 +181,15 @@ class _GoalsScreenState extends State<GoalsScreen> {
     int random = Random().nextInt(2);
 
     final appBar = AppBar(
+      leading: IconButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed(HistoryScreen.routeName);
+        },
+        icon: Icon(Icons.history, size: 30),
+      ),
       title:
           Text("My Goals", style: Theme.of(context).appBarTheme.titleTextStyle),
       actions: [
-        IconButton(
-          onPressed: () {
-            Navigator.of(context).pushNamed(HistoryScreen.routeName);
-          },
-          icon: Icon(Icons.history, size: 30),
-        ),
         IconButton(
           onPressed: () async {
             final response =

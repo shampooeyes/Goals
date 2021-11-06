@@ -606,9 +606,10 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                             padding: const EdgeInsets.only(left: 10),
                             child: TextField(
                               controller: _descController,
-                              keyboardType: TextInputType.text,
+                              keyboardType: TextInputType.multiline,
                               maxLength: 100,
                               maxLines: 2,
+                              enableInteractiveSelection: false,
                               cursorHeight: 13.5,
                               cursorRadius: Radius.circular(15),
                               cursorColor: Palette.primary,
