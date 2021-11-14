@@ -32,40 +32,71 @@ class HabitList extends ChangeNotifier {
     int bestStrk = 0;
     int counter = 0;
     List<DateTime> dates = [];
-    habit.events.forEach((date, list) {
-      dates.add(date);
-      if (list[0].done) {
-        counter++;
-        data += date.toIso8601String() + " ";
-      } else {
-        bestStrk = max(counter, bestStrk);
-        counter = 0;
-      }
-    });
+    if (habit.make) {
+      habit.events.forEach((date, list) {
+        dates.add(date);
+        if (list[0].done) {
+          counter++;
+          data += date.toIso8601String() + " ";
+        } else {
+          bestStrk = max(counter, bestStrk);
+          counter = 0;
+        }
+      });
 
-    habit.bestStreak = (bestStrk * habit.repeat) - 1;
-    dates = dates.reversed.toList();
-    dates.retainWhere((element) => element.isBefore(DateTime.now()));
-    counter = 0;
-    int daysAtEnd = 0;
-    for (int i = 0; i < dates.length; i++) {
-      DateTime date = dates[i];
+      habit.bestStreak = (bestStrk * habit.repeat) - 1;
+      dates = dates.reversed.toList();
+      dates.retainWhere((element) => element.isBefore(DateTime.now()));
+      counter = 0;
+      int daysAtEnd = 0;
+      for (int i = 0; i < dates.length; i++) {
+        DateTime date = dates[i];
 
-      if (i == 0 && habit.events[date]![0].done) {
-        DateTime tod = DateTime.now();
-        daysAtEnd =
-            DateTime(tod.year, tod.month, tod.day).difference(date).inDays;
-      }
+        if (i == 0 && habit.events[date]![0].done) {
+          DateTime tod = DateTime.now();
+          daysAtEnd =
+              DateTime(tod.year, tod.month, tod.day).difference(date).inDays;
+        }
 
-      if (!habit.events[date]![0].done) {
-        break;
-      } else {
-        counter++;
+        if (!habit.events[date]![0].done) {
+          break;
+        } else {
+          counter++;
+        }
       }
+      habit.currentStreak =
+          counter == 0 ? 0 : ((counter - 1) * habit.repeat) + daysAtEnd + 1;
+      habit.bestStreak = max(habit.bestStreak, habit.currentStreak);
+    } else {
+      habit.events.forEach((date, list) {
+        dates.add(date);
+      });
+      DateTime now = DateTime.now();
+      for (DateTime d = habit.creationDate;
+          d.isBefore(DateTime(now.year, now.month, now.day));
+          d = d.add(Duration(days: 1))) {
+        if (habit.events[d]![0].done) {
+          // is a relapse
+          bestStrk = max(bestStrk, counter);
+          counter = 0;
+        } else
+          counter++;
+      }
+      dates = [];
+      habit.events.forEach((date, list) {
+        if (date.isBefore(now) && list[0].done) dates.add(date);
+      });
+      bestStrk = max(bestStrk, counter);
+      habit.bestStreak = bestStrk;
+      dates = dates.reversed.toList();
+      int currentStreak;
+      if (dates.isEmpty)
+        currentStreak = DateTime.now().difference(habit.creationDate).inDays;
+      else
+        currentStreak = DateTime.now().difference(dates[0]).inDays;
+
+      habit.currentStreak = currentStreak;
     }
-    habit.currentStreak =
-        counter == 0 ? 0 : ((counter - 1) * habit.repeat) + daysAtEnd + 1;
-    habit.bestStreak = max(habit.bestStreak, habit.currentStreak);
     notifyListeners();
     DatabaseHelper.updateHabitsEvents(
         habit.key, {"id": habit.key, "dates": data});
@@ -86,40 +117,70 @@ class HabitList extends ChangeNotifier {
       int bestStrk = 0;
       int counter = 0;
       List<DateTime> dates = [];
+      if (habit.make) {
+        habit.events.forEach((date, list) {
+          dates.add(date);
+          if (list[0].done) {
+            counter++;
+          } else {
+            bestStrk = max(counter, bestStrk);
+            counter = 0;
+          }
+        });
+
+        habit.bestStreak = (bestStrk * habit.repeat) - 1;
+        dates = dates.reversed.toList();
+        dates.retainWhere((element) => element.isBefore(DateTime.now()));
+        counter = 0;
+        int daysAtEnd = 0;
+        for (int i = 0; i < dates.length; i++) {
+          DateTime date = dates[i];
+
+          if (i == 0 && habit.events[date]![0].done) {
+            DateTime tod = DateTime.now();
+            daysAtEnd =
+                DateTime(tod.year, tod.month, tod.day).difference(date).inDays;
+          }
+
+          if (!habit.events[date]![0].done) {
+            break;
+          } else {
+            counter++;
+          }
+        }
+        habit.currentStreak =
+            counter == 0 ? 0 : ((counter - 1) * habit.repeat) + daysAtEnd;
+        habit.bestStreak = max(habit.bestStreak, habit.currentStreak);
+      } else {
       habit.events.forEach((date, list) {
         dates.add(date);
-        if (list[0].done) {
-          counter++;
-        } else {
-          bestStrk = max(counter, bestStrk);
-          counter = 0;
-        }
       });
-
-      habit.bestStreak = (bestStrk * habit.repeat) - 1;
-      dates = dates.reversed.toList();
-      dates.retainWhere((element) => element.isBefore(DateTime.now()));
-      counter = 0;
-      int daysAtEnd = 0;
-      for (int i = 0; i < dates.length; i++) {
-        DateTime date = dates[i];
-
-        if (i == 0 && habit.events[date]![0].done) {
-          DateTime tod = DateTime.now();
-          daysAtEnd =
-              DateTime(tod.year, tod.month, tod.day).difference(date).inDays;
-          print(daysAtEnd);
-        }
-
-        if (!habit.events[date]![0].done) {
-          break;
-        } else {
+      DateTime now = DateTime.now();
+      for (DateTime d = habit.creationDate;
+          d.isBefore(DateTime(now.year, now.month, now.day));
+          d = d.add(Duration(days: 1))) {
+        if (habit.events[d]![0].done) {
+          // is a relapse
+          bestStrk = max(bestStrk, counter);
+          counter = 0;
+        } else
           counter++;
-        }
       }
-      habit.currentStreak =
-          counter == 0 ? 0 : ((counter - 1) * habit.repeat) + daysAtEnd;
-      habit.bestStreak = max(habit.bestStreak, habit.currentStreak);
+      dates = [];
+      habit.events.forEach((date, list) {
+        if (date.isBefore(now) && list[0].done) dates.add(date);
+      });
+      bestStrk = max(bestStrk, counter);
+      habit.bestStreak = bestStrk;
+      dates = dates.reversed.toList();
+      int currentStreak;
+      if (dates.isEmpty)
+        currentStreak = DateTime.now().difference(habit.creationDate).inDays;
+      else
+        currentStreak = DateTime.now().difference(dates[0]).inDays;
+
+      habit.currentStreak = currentStreak;
+    }
     });
 
     notifyListeners();

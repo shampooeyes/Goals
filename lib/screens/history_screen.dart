@@ -52,7 +52,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
             //History items filtered by datescroller
             Consumer<History>(builder: (ctx, snapshot, child) {
-              List<HistoryItem> _items = snapshot.getHistory(filterDate);
+              List<HistoryItem> _items = snapshot.getHistory(filterDate).reversed.toList();
               return Container(
                 height: device.size.height -
                     device.viewPadding.bottom -

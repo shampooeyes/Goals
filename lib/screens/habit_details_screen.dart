@@ -25,16 +25,12 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
   @override
   void initState() {
     _totalEvents = widget.habit.events;
-    widget.habit.events.forEach((key, value) {
-      print(value[0].done);
-    });
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsfromDay(_selectedDay!));
     super.initState();
   }
 
   List<Event> _getEventsfromDay(DateTime date) {
-    // print(DateTime(date.year, date.month, date.day));
     return _totalEvents[DateTime(date.year, date.month, date.day)] ?? [];
   }
 
@@ -152,6 +148,27 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
                       shape: BoxShape.circle),
                 ),
                 eventLoader: _getEventsfromDay,
+                calendarBuilders: CalendarBuilders(
+                  singleMarkerBuilder: (context, date, event) {
+                    Color cor = Palette.darkred;
+                    if (event.runtimeType == Event) {
+                      if ((event as Event).done) {
+                        cor = widget.habit.make ? Palette.primary : Palette.red;
+                      } else {
+                        cor = widget.habit.make
+                            ? Palette.primary.withOpacity(0.4)
+                            : Palette.background.withOpacity(0);
+                      }
+                    }
+                    return Container(
+                      decoration:
+                          BoxDecoration(shape: BoxShape.circle, color: cor),
+                      width: 7.0,
+                      height: 7.0,
+                      margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                    );
+                  },
+                ),
               ),
               SizedBox(height: 10),
               Expanded(
@@ -177,7 +194,7 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                                 child: Text(
-                                  "Done",
+                                  widget.habit.make ? "Done" : "Relapse",
                                   style: TextStyle(
                                       color: Color(0xff989898), fontSize: 16),
                                 ),
@@ -207,7 +224,7 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                                 child: Text(
-                                  "Done",
+                                  widget.habit.make ? "Done" : "Relapse",
                                   style: TextStyle(
                                       color: event.done
                                           ? Palette.white
