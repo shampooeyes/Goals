@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.mygoals">
+    package="com.kareemelkadery.mygoals">
+   <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="mygoals"
+        android:label="My Goals"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

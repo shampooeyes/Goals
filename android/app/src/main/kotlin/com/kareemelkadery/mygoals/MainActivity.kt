@@ -1,4 +1,4 @@
-package com.example.mygoals
+package com.kareemelkadery.mygoals
 
 import io.flutter.embedding.android.FlutterActivity
 
