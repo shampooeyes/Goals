@@ -17,13 +17,15 @@ class NewGoalScreen extends StatefulWidget {
   _NewGoalScreenState createState() => _NewGoalScreenState();
 }
 
-class _NewGoalScreenState extends State<NewGoalScreen> {
+class _NewGoalScreenState extends State<NewGoalScreen>
+    with SingleTickerProviderStateMixin {
   final key = UniqueKey();
 
   final _descController = TextEditingController();
   final _repeatController = TextEditingController();
   final _titleController = TextEditingController();
   final _habitTitleController = TextEditingController();
+  late final TabController _tabController;
 
   DateTime _targetDate =
       DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
@@ -37,6 +39,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
   List<Milestone> _milestones = [];
   TimeOfDay _selectedTime = TimeOfDay(hour: 12, minute: 0);
   Color _buttonColor = Palette.primary;
+  String buttonText = "ADD GOAL";
   bool _make = true;
 
   @override
@@ -45,7 +48,30 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
     _repeatController.dispose();
     _titleController.dispose();
     _habitTitleController.dispose();
+    _tabController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() => setState(() {
+          _handleTabChange();
+        }));
+    super.initState();
+  }
+
+  void _handleTabChange() {
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null)
+      currentFocus.unfocus();
+    if (_tabController.index == 0) {
+      _buttonColor = Palette.primary;
+      buttonText = "ADD GOAL";
+    } else {
+      buttonText = "ADD HABIT";
+      if (!_make) _buttonColor = Palette.red;
+    }
   }
 
   void _addMilestone(Milestone milestone) {
@@ -55,7 +81,9 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
   }
 
   Future<void> _selectDate(BuildContext context, DateTime initDate) async {
-    FocusScope.of(context).requestFocus(new FocusNode());
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null)
+      currentFocus.unfocus();
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: initDate,
@@ -72,7 +100,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
     );
     if (pickedDate != null && pickedDate != DateTime.now())
       setState(() {
-        if (DefaultTabController.of(context)?.index == 0)
+        if (_tabController.index == 0)
           _targetDate =
               DateTime(pickedDate.year, pickedDate.month, pickedDate.day);
         else
@@ -90,7 +118,9 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
         builder: (ctx) {
           return GestureDetector(
             onTap: () {
-              FocusScope.of(context).requestFocus(new FocusNode());
+              FocusScopeNode currentFocus = FocusScope.of(context);
+              if (!currentFocus.hasPrimaryFocus &&
+                  currentFocus.focusedChild != null) currentFocus.unfocus();
             },
             child: StatefulBuilder(
               builder: (ctx, setState) => AlertDialog(
@@ -118,6 +148,8 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                         final number = int.tryParse(_tempController.text);
                         if (number == null) {
                           Navigator.of(context).pop();
+
+                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content: Text("Please only enter numbers"),
                             backgroundColor: Palette.darkred,
@@ -159,8 +191,12 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                       ),
                     ),
                     DropdownButton(
-                      onTap: () =>
-                          FocusScope.of(context).requestFocus(new FocusNode()),
+                      onTap: () {
+                        FocusScopeNode currentFocus = FocusScope.of(context);
+                        if (!currentFocus.hasPrimaryFocus &&
+                            currentFocus.focusedChild != null)
+                          currentFocus.unfocus();
+                      },
                       dropdownColor: Palette.background,
                       value: _repeatPeriod,
                       onChanged: (value) {
@@ -227,7 +263,9 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
         builder: (ctx) {
           return GestureDetector(
             onTap: () {
-              FocusScope.of(context).requestFocus(new FocusNode());
+              FocusScopeNode currentFocus = FocusScope.of(context);
+              if (!currentFocus.hasPrimaryFocus &&
+                  currentFocus.focusedChild != null) currentFocus.unfocus();
             },
             child: StatefulBuilder(
               builder: (ctx, setState) => AlertDialog(
@@ -255,6 +293,8 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                         final number = int.tryParse(_tempController.text);
                         if (number == null) {
                           Navigator.of(context).pop();
+
+                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content: Text("Please only enter numbers"),
                             backgroundColor: Palette.darkred,
@@ -294,8 +334,12 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                       ),
                     ),
                     DropdownButton(
-                      onTap: () =>
-                          FocusScope.of(context).requestFocus(new FocusNode()),
+                      onTap: () {
+                        FocusScopeNode currentFocus = FocusScope.of(context);
+                        if (!currentFocus.hasPrimaryFocus &&
+                            currentFocus.focusedChild != null)
+                          currentFocus.unfocus();
+                      },
                       dropdownColor: Palette.background,
                       value: _repeatPeriod,
                       onChanged: (value) {
@@ -356,6 +400,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
 
   void _submitGoal(BuildContext context) async {
     if (_titleController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Please enter goal title"),
         backgroundColor: Palette.darkred,
@@ -366,7 +411,8 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
     String? notificationId;
     if (_reminder) {
       final date = DateTime(_targetDate.year, _targetDate.month,
-          _targetDate.day, _selectedTime.hour, _selectedTime.minute);
+              _targetDate.day, _selectedTime.hour, _selectedTime.minute)
+          .toUtc();
 
       final OSDeviceState? status = await OneSignal.shared.getDeviceState();
       if (status != null) {
@@ -375,8 +421,8 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
           "app_id": "bbdc8751-01db-4011-b5c6-79c78b349bd6",
           "include_player_ids": [playerId],
           "contents": {"en": "Reminder: ${_titleController.text.trim()}"},
-          "delayed_option": "timezone",
-          "delivery_time_of_day": date.toIso8601String(),
+          "send_after": date.toIso8601String(),
+          "android_channel_id": "16de5e7e-7580-4500-b445-6a18917bd6e5",
         });
         notificationId = response["id"];
       }
@@ -397,6 +443,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
 
   void _submitHabit(BuildContext context) {
     if (_habitTitleController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Please enter habit title"),
         backgroundColor: Palette.darkred,
@@ -445,21 +492,28 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async {
-        FocusScope.of(context).requestFocus(new FocusNode());
-        await Future.delayed(Duration(milliseconds: 80), () {});
-        return true;
-      },
-      child: DefaultTabController(
-        length: 2,
-        child: Builder(builder: (context) {
-          return Scaffold(
+        onWillPop: () async {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if (!currentFocus.hasPrimaryFocus &&
+              currentFocus.focusedChild != null) currentFocus.unfocus();
+          await Future.delayed(Duration(milliseconds: 80), () {});
+          return true;
+        },
+        child: GestureDetector(
+          onTap: () {
+            FocusScopeNode currentFocus = FocusScope.of(context);
+            if (!currentFocus.hasPrimaryFocus &&
+                currentFocus.focusedChild != null) {
+              currentFocus.unfocus();
+            }
+          },
+          child: Scaffold(
             resizeToAvoidBottomInset: false,
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
             floatingActionButton: GestureDetector(
               onTap: () {
-                DefaultTabController.of(context)?.index == 0
+                _tabController.index == 0
                     ? _submitGoal(context)
                     : _submitHabit(context);
               },
@@ -476,15 +530,13 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                           blurRadius: 10,
                           spreadRadius: 0)
                     ],
-                    color: DefaultTabController.of(context)?.index == 0
+                    color: _tabController.index == 0
                         ? Palette.primary
                         : _buttonColor),
                 child: Center(
                   child: Text(
-                    DefaultTabController.of(context)?.index == 0
-                        ? "ADD GOAL"
-                        : "ADD HABIT",
-                    style: Theme.of(context).textTheme.button,
+                    buttonText,
+                    style: Palette.buttonTheme,
                   ),
                 ),
               ),
@@ -494,9 +546,11 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
               title: Text("New Goal",
                   style: Theme.of(context).appBarTheme.titleTextStyle),
               bottom: TabBar(
+                controller: _tabController,
                 onTap: (_) {
-                  FocusScope.of(context).requestFocus(new FocusNode());
-                  setState(() {});
+                  FocusScopeNode currentFocus = FocusScope.of(context);
+                  if (!currentFocus.hasPrimaryFocus &&
+                      currentFocus.focusedChild != null) currentFocus.unfocus();
                 },
                 labelColor: Palette.white,
                 unselectedLabelColor: Color(0xFFe9d5bb),
@@ -526,6 +580,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
               ),
             ),
             body: TabBarView(
+              controller: _tabController,
               children: [
                 SingleChildScrollView(
                   child: Column(
@@ -540,8 +595,9 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                         ),
                       ),
                       Container(
-                          margin: const EdgeInsets.only(left: 15.5),
-                          width: 360,
+                          margin:
+                              const EdgeInsets.only(left: 15.5, right: 15.5),
+                          // width: 360,
                           height: 40,
                           decoration: BoxDecoration(
                               borderRadius:
@@ -556,25 +612,32 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                                     spreadRadius: 0)
                               ],
                               color: Palette.white),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 8),
-                            child: TextField(
-                              controller: _titleController,
-                              maxLength: 50,
-                              cursorColor: Palette.primary,
-                              cursorHeight: 13.5,
-                              cursorRadius: Radius.circular(15),
-                              autocorrect: false,
-                              style: const TextStyle(
-                                  color: Palette.text,
-                                  fontFamily: "OpenSans",
-                                  fontSize: 13.5),
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                counterText: "",
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                left: 10,
+                                bottom: -4.5,
+                                child: Container(
+                                  width: 300,
+                                  child: TextField(
+                                    controller: _titleController,
+                                    maxLength: 50,
+                                    cursorColor: Palette.primary,
+                                    cursorHeight: 13.5,
+                                    cursorRadius: Radius.circular(15),
+                                    autocorrect: false,
+                                    style: const TextStyle(
+                                        color: Palette.text,
+                                        fontFamily: "OpenSans",
+                                        fontSize: 13.5),
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      counterText: "",
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           )),
                       Padding(
                         padding: const EdgeInsets.only(
@@ -585,8 +648,9 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                         ),
                       ),
                       Container(
-                          margin: const EdgeInsets.only(left: 15.5),
-                          width: 360,
+                          margin:
+                              const EdgeInsets.only(left: 15.5, right: 15.5),
+                          // width: 360,
                           height: 60,
                           decoration: BoxDecoration(
                               borderRadius:
@@ -609,7 +673,6 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                               keyboardType: TextInputType.multiline,
                               maxLength: 100,
                               maxLines: 2,
-                              enableInteractiveSelection: false,
                               cursorHeight: 13.5,
                               cursorRadius: Radius.circular(15),
                               cursorColor: Palette.primary,
@@ -641,7 +704,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                           itemBuilder: (ctx, index) {
                             return Container(
                               margin: const EdgeInsets.only(
-                                  left: 15.5, bottom: 7.5),
+                                  left: 15.5, bottom: 7.5,right: 15.5),
                               height: 40,
                               decoration: BoxDecoration(
                                   borderRadius:
@@ -696,39 +759,44 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                           itemCount: _milestones.length,
                         ),
                       ),
-                      Container(
-                          margin: const EdgeInsets.only(left: 15.5),
-                          width: 360,
-                          height: 40,
-                          decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: const Color(0x1a000000),
-                                    offset: Offset(1.2246467991473532e-16, 2),
-                                    blurRadius: 8,
-                                    spreadRadius: 0)
-                              ],
-                              color: Palette.milestone),
-                          child: Stack(children: [
-                            Positioned(
-                              right: 3.5,
-                              top: 3.5,
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (ctx) => NewMilestoneScreen(
-                                          _addMilestone, key.toString())));
-                                },
+                      GestureDetector(
+                        onTap: () {
+                          FocusScopeNode currentFocus = FocusScope.of(context);
+                          if (!currentFocus.hasPrimaryFocus &&
+                              currentFocus.focusedChild != null)
+                            currentFocus.unfocus();
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (ctx) => NewMilestoneScreen(
+                                  _addMilestone, key.toString())));
+                        },
+                        child: Container(
+                            margin:
+                                const EdgeInsets.only(left: 15.5, right: 15.5),
+                            // width: 360,
+                            height: 40,
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: const Color(0x1a000000),
+                                      offset: Offset(1.2246467991473532e-16, 2),
+                                      blurRadius: 8,
+                                      spreadRadius: 0)
+                                ],
+                                color: Palette.milestone),
+                            child: Stack(children: [
+                              Positioned(
+                                right: 3.5,
+                                top: 3.5,
                                 child: Icon(
                                   CupertinoIcons.add,
                                   color: Palette.white,
                                   size: 34,
                                 ),
                               ),
-                            ),
-                          ])),
+                            ])),
+                      ),
                       Container(
                         margin: const EdgeInsets.only(top: 20),
                         child: Row(
@@ -1002,8 +1070,9 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Container(
-                          margin: const EdgeInsets.only(left: 15.5),
-                          width: 360,
+                          margin:
+                              const EdgeInsets.only(left: 15.5, right: 15.5),
+                          // width: 360,
                           height: 40,
                           decoration: BoxDecoration(
                               borderRadius:
@@ -1186,9 +1255,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                 )
               ],
             ),
-          );
-        }),
-      ),
-    );
+          ),
+        ));
   }
 }

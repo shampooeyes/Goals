@@ -25,17 +25,6 @@ class DateChip extends StatelessWidget {
 
     return Container(
       width: tomorrow ? 84 : 56,
-      height: 30,
-      margin: const EdgeInsets.only(right: 10),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(30)),
-          border: Border.all(color: Palette.primary, width: 1.5),
-          color: isSelected ? Palette.primary : Palette.background,
-          boxShadow: [
-            if (isSelected)
-              const BoxShadow(
-                  color: Color(0xff42ad9f), spreadRadius: 0.5, blurRadius: 3)
-          ]),
       child: Center(
         child: Text(
           title,

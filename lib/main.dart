@@ -22,7 +22,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   void initState() {
     super.initState();
@@ -30,7 +29,6 @@ class _MyAppState extends State<MyApp> {
     final appId = "bbdc8751-01db-4011-b5c6-79c78b349bd6";
     OneSignal.shared.setAppId(appId);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -51,22 +49,24 @@ class _MyAppState extends State<MyApp> {
         title: 'My Goals',
         theme: ThemeData(
           backgroundColor: Palette.background,
+          textSelectionTheme:
+              TextSelectionThemeData(selectionHandleColor: Palette.primary),
           textTheme: TextTheme(
-            headline1: TextStyle(
+            headline1: const TextStyle(
               // Habits and Goals
               fontFamily: 'Poppins',
               fontSize: 26,
               fontWeight: FontWeight.w500,
               color: Palette.primary,
             ),
-            headline2: TextStyle(
+            headline2: const TextStyle(
               // Goal tile header
               fontFamily: "Poppins",
               fontWeight: FontWeight.w500,
               fontSize: 18,
               color: Palette.white,
             ),
-            bodyText1: TextStyle(
+            bodyText1: const TextStyle(
               fontFamily: 'OpenSans',
               fontSize: 15,
               fontWeight: FontWeight.w400,
@@ -77,14 +77,8 @@ class _MyAppState extends State<MyApp> {
                 fontWeight: FontWeight.w600,
                 fontFamily: "OpenSans",
                 fontSize: 13.0),
-            button: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 26,
-              fontWeight: FontWeight.w600,
-              color: Palette.white,
-            ),
           ),
-          appBarTheme: AppBarTheme(
+          appBarTheme: const AppBarTheme(
             toolbarHeight: 56,
             titleTextStyle: TextStyle(
               fontFamily: 'Poppins',

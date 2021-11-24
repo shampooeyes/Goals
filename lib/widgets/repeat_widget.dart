@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../Palette.dart';
 
 class RepeatWidget extends StatefulWidget {
-
   @override
   _RepeatWidgetState createState() => _RepeatWidgetState();
 }
@@ -15,7 +14,14 @@ class _RepeatWidgetState extends State<RepeatWidget> {
   String _repeatPeriod = "days";
   String _repeatText = "";
 
-  Future _selectRepeat(BuildContext context) { //Push to different widget
+  @override
+  void dispose() {
+    _repeatController.dispose();
+    super.dispose();
+  }
+
+  Future _selectRepeat(BuildContext context) {
+    //Push to different widget
     final _tempController = TextEditingController();
     _repeatPeriod = _repeater ? _repeatPeriod : "days";
     _tempController.text = _repeater ? _repeatController.text : "";
@@ -24,7 +30,9 @@ class _RepeatWidgetState extends State<RepeatWidget> {
         builder: (ctx) {
           return GestureDetector(
             onTap: () {
-              FocusScope.of(context).requestFocus(new FocusNode());
+              FocusScopeNode currentFocus = FocusScope.of(context);
+              if (!currentFocus.hasPrimaryFocus &&
+                  currentFocus.focusedChild != null) currentFocus.unfocus();
             },
             child: StatefulBuilder(
               builder: (ctx, setState) => AlertDialog(
@@ -52,6 +60,8 @@ class _RepeatWidgetState extends State<RepeatWidget> {
                         final number = int.tryParse(_tempController.text);
                         if (number == null) {
                           Navigator.of(context).pop();
+
+                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content: Text("Please only enter numbers"),
                             backgroundColor: Palette.darkred,
@@ -96,8 +106,12 @@ class _RepeatWidgetState extends State<RepeatWidget> {
                       ),
                     ),
                     DropdownButton(
-                      onTap: () =>
-                          FocusScope.of(context).requestFocus(new FocusNode()),
+                      onTap: () {
+                        FocusScopeNode currentFocus = FocusScope.of(context);
+                        if (!currentFocus.hasPrimaryFocus &&
+                            currentFocus.focusedChild != null)
+                          currentFocus.unfocus();
+                      },
                       dropdownColor: Palette.background,
                       value: _repeatPeriod,
                       onChanged: (value) {
@@ -157,63 +171,47 @@ class _RepeatWidgetState extends State<RepeatWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(
-                              children: [
-                                Text(
-                                  "Repeat",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      ?.copyWith(
-                                          color: _repeater
-                                              ? Palette.text
-                                              : Color(0xff989898)),
-                                ),
-                                SizedBox(height: 5),
-                                GestureDetector(
-                                  onTap: () {
-                                    _selectRepeat(context);
-                                    if (_repeatController.text.isEmpty) {
-                                      setState(() => _repeater = false);
-                                    }
-                                  },
-                                  child: Container(
-                                    width: 100,
-                                    height: 27,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(8)),
-                                        color: _repeater
-                                            ? Palette.primary
-                                            : Palette.milestone),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          CupertinoIcons.restart,
-                                          color: _repeater
-                                              ? Palette.white
-                                              : Color(0xff989898),
-                                          size: 13,
-                                        ),
-                                        SizedBox(width: 6),
-                                        Text(
-                                          _repeater
-                                              ? _repeatText
-                                              : "2 days",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyText2
-                                              ?.copyWith(
-                                                  color: _repeater
-                                                      ? Palette.white
-                                                      : Color(0xff989898)),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              ],
-                            );
+      children: [
+        Text(
+          "Repeat",
+          style: Theme.of(context)
+              .textTheme
+              .bodyText1
+              ?.copyWith(color: _repeater ? Palette.text : Color(0xff989898)),
+        ),
+        SizedBox(height: 5),
+        GestureDetector(
+          onTap: () {
+            _selectRepeat(context);
+            if (_repeatController.text.isEmpty) {
+              setState(() => _repeater = false);
+            }
+          },
+          child: Container(
+            width: 100,
+            height: 27,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+                color: _repeater ? Palette.primary : Palette.milestone),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  CupertinoIcons.restart,
+                  color: _repeater ? Palette.white : Color(0xff989898),
+                  size: 13,
+                ),
+                SizedBox(width: 6),
+                Text(
+                  _repeater ? _repeatText : "2 days",
+                  style: Theme.of(context).textTheme.bodyText2?.copyWith(
+                      color: _repeater ? Palette.white : Color(0xff989898)),
+                ),
+              ],
+            ),
+          ),
+        )
+      ],
+    );
   }
 }

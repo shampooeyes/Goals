@@ -170,7 +170,7 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
                   },
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Expanded(
                 child: ValueListenableBuilder<List<Event>>(
                     valueListenable: _selectedEvents,

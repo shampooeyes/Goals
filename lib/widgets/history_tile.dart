@@ -123,8 +123,8 @@ class _HistoryTileState extends State<HistoryTile> {
                             IconButton(
                               onPressed: () {
                                 Share.share(
-                                    "I finally accomplished ${widget.title}");
-                              }, // share
+                                    "Look what I accomplished!\n•${widget.title}\n\nKeep track of your goals with this app!\nhttps://play.google.com/store/apps/details?id=com.kareemelkadery.mygoals");
+                              }, 
                               icon: Icon(
                                 Icons.share,
                                 color: Color(0xff97b1aa),

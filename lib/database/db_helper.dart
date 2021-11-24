@@ -8,7 +8,7 @@ class DatabaseHelper {
       final goalDb = await sql.openDatabase(path.join(dbPath, 'goals.db'),
           onCreate: (db, version) async {
         await db.execute(
-            'CREATE TABLE Goals(id TEXT PRIMARY KEY, parentId TEXT, title TEXT, desc TEXT, enddate TEXT, reminder INTEGER, repeat INTEGER, notificationId TEXT)');
+            'CREATE TABLE Goals(id TEXT PRIMARY KEY, parentId TEXT, title TEXT, desc TEXT, enddate TEXT, reminder INTEGER, totalMilestones INTEGER, repeat INTEGER, notificationId TEXT)');
       }, version: 1);
       goalDb.insert(
         table,
@@ -20,7 +20,7 @@ class DatabaseHelper {
       final milestoneDb = await sql.openDatabase(
           path.join(dbPath, "milestones.db"), onCreate: (db, version) {
         return db.execute(
-            "CREATE TABLE Milestones(id TEXT PRIMARY KEY, parentId TEXT, title TEXT, enddate TEXT, reminder INTEGER)");
+            "CREATE TABLE Milestones(id TEXT PRIMARY KEY, parentId TEXT, title TEXT, enddate TEXT, milestoneNumber INTEGER, reminder INTEGER)");
       }, version: 1);
       int result = await milestoneDb.insert(
         table,
@@ -118,7 +118,7 @@ class DatabaseHelper {
     final goalDb = await sql.openDatabase(path.join(dbPath, "goals.db"),
         onCreate: (db, version) {
       return db.execute(
-          "CREATE TABLE Goals(id TEXT PRIMARY KEY, parentId TEXT, title TEXT, desc TEXT, enddate TEXT, reminder INTEGER, repeat INTEGER, notificationId TEXT)");
+          "CREATE TABLE Goals(id TEXT PRIMARY KEY, parentId TEXT, title TEXT, desc TEXT, enddate TEXT, totalMilestones INTEGER, reminder INTEGER, repeat INTEGER, notificationId TEXT)");
     }, version: 1);
     return goalDb.query("Goals");
   }
@@ -128,7 +128,7 @@ class DatabaseHelper {
     final milestoneDb = await sql.openDatabase(
         path.join(dbPath, "milestones.db"), onCreate: (db, version) {
       return db.execute(
-          "CREATE TABLE Milestones(id TEXT PRIMARY KEY, parentId TEXT, title TEXT, enddate TEXT)");
+          "CREATE TABLE Milestones(id TEXT PRIMARY KEY, parentId TEXT, milestoneNumber INTEGER, title TEXT, enddate TEXT)");
     }, version: 1);
     return milestoneDb.query("Milestones");
   }

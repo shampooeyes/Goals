@@ -19,8 +19,16 @@ class _NewMilestoneScreenState extends State<NewMilestoneScreen> {
   final _titleController = TextEditingController();
   DateTime _targetDate = DateTime.now();
 
+  @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose();
+  }
+
   void _submit(BuildContext context) {
     if (_titleController.text.trim().isEmpty) {
+      
+            ScaffoldMessenger.of(context).removeCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Please enter milestone title"),
         backgroundColor: Palette.darkred,
@@ -60,123 +68,134 @@ class _NewMilestoneScreenState extends State<NewMilestoneScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: GestureDetector(
-          onTap: () => _submit(context),
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 40),
-            width: 220,
-            height: 57,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(57)),
-                boxShadow: [
-                  BoxShadow(
-                      color: const Color(0x4d000000),
-                      offset: Offset(1.2246467991473532e-16, 2),
-                      blurRadius: 10,
-                      spreadRadius: 0)
-                ],
-                color: Palette.primary),
-            child: Center(
-              child: Text(
-                "ADD",
-                style: Theme.of(context).textTheme.button,
-              ),
-            ),
-          ),
-        ),
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text("New Milestone",
-              style: Theme.of(context).appBarTheme.titleTextStyle),
-        ),
-        body: SingleChildScrollView(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 20.0, top: 14.5, bottom: 5),
-            child: Text(
-              "Milestone Title",
-              style: Theme.of(context).textTheme.bodyText1,
-            ),
-          ),
-          Container(
-              margin: const EdgeInsets.only(left: 15.5),
-              width: 360,
-              height: 40,
+    return GestureDetector(
+      onTap: () {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+          currentFocus.unfocus();
+        }
+        },
+          child: Scaffold(
+            resizeToAvoidBottomInset: false,
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+          floatingActionButton: GestureDetector(
+            onTap: () => _submit(context),
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 40),
+              width: 220,
+              height: 57,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  border: Border.all(color: Palette.primary, width: 1),
+                  borderRadius: BorderRadius.all(Radius.circular(57)),
                   boxShadow: [
                     BoxShadow(
-                        color: const Color(0x1a000000),
+                        color: const Color(0x4d000000),
                         offset: Offset(1.2246467991473532e-16, 2),
-                        blurRadius: 8,
+                        blurRadius: 10,
                         spreadRadius: 0)
                   ],
-                  color: Palette.white),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                child: TextField(
-                  controller: _titleController,
-                  maxLength: 26,
-                  cursorColor: Palette.primary,
-                  cursorHeight: 13.5,
-                  cursorRadius: Radius.circular(15),
-                  autocorrect: false,
-                  style: const TextStyle(
-                      color: Palette.text,
-                      fontFamily: "OpenSans",
-                      fontSize: 13.5),
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    counterText: "",
-                  ),
+                  color: Palette.primary),
+              child: Center(
+                child: Text(
+                  "ADD",
+                  style: Palette.buttonTheme,
                 ),
-              )),
-          Center(
-            child: Container(
-              margin: const EdgeInsets.only(top: 20),
-              child: Column(
-                children: [
-                  Text(
-                    "Target Date",
-                    style: Theme.of(context).textTheme.bodyText1,
-                  ),
-                  SizedBox(height: 5),
-                  GestureDetector(
-                      onTap: () {
-                        _selectDate(context);
-                        FocusScope.of(context).requestFocus(new FocusNode());
-                      },
-                      child: Container(
-                        width: 110,
-                        height: 27,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                            color: Palette.primary),
-                        child: Row(children: [
-                          Text(
-                            DateFormat("dd/MM/yyyy").format(_targetDate),
-                            style: Theme.of(context).textTheme.bodyText2,
-                          ),
-                          Spacer(),
-                          GestureDetector(
-                              onTap: () {},
-                              child: Icon(
-                                Icons.calendar_today,
-                                size: 12,
-                                color: Palette.white,
-                              ))
-                        ]),
-                      ))
-                ],
               ),
             ),
           ),
-        ])));
+          appBar: AppBar(
+            centerTitle: true,
+            title: Text("New Milestone",
+                style: Theme.of(context).appBarTheme.titleTextStyle),
+          ),
+          body: SingleChildScrollView(
+              child:
+                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0, top: 14.5, bottom: 5),
+              child: Text(
+                "Milestone Title",
+                style: Theme.of(context).textTheme.bodyText1,
+              ),
+            ),
+            Container(
+                margin: const EdgeInsets.only(left: 15.5,right: 15.5),
+                // width: 360,
+                height: 40,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    border: Border.all(color: Palette.primary, width: 1),
+                    boxShadow: [
+                      BoxShadow(
+                          color: const Color(0x1a000000),
+                          offset: Offset(1.2246467991473532e-16, 2),
+                          blurRadius: 8,
+                          spreadRadius: 0)
+                    ],
+                    color: Palette.white),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  child: TextField(
+                    controller: _titleController,
+                    maxLength: 26,
+                    cursorColor: Palette.primary,
+                    cursorHeight: 13.5,
+                    cursorRadius: Radius.circular(15),
+                    autocorrect: false,
+                    style: const TextStyle(
+                        color: Palette.text,
+                        fontFamily: "OpenSans",
+                        fontSize: 13.5),
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      counterText: "",
+                    ),
+                  ),
+                )),
+            Center(
+              child: Container(
+                margin: const EdgeInsets.only(top: 20),
+                child: Column(
+                  children: [
+                    Text(
+                      "Target Date",
+                      style: Theme.of(context).textTheme.bodyText1,
+                    ),
+                    SizedBox(height: 5),
+                    GestureDetector(
+                        onTap: () {
+                          _selectDate(context);
+                          FocusScopeNode currentFocus = FocusScope.of(context);
+      if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null)
+        currentFocus.unfocus();
+                        },
+                        child: Container(
+                          width: 110,
+                          height: 27,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(8)),
+                              color: Palette.primary),
+                          child: Row(children: [
+                            Text(
+                              DateFormat("dd/MM/yyyy").format(_targetDate),
+                              style: Theme.of(context).textTheme.bodyText2,
+                            ),
+                            Spacer(),
+                            GestureDetector(
+                                onTap: () {},
+                                child: Icon(
+                                  Icons.calendar_today,
+                                  size: 12,
+                                  color: Palette.white,
+                                ))
+                          ]),
+                        ))
+                  ],
+                ),
+              ),
+            ),
+          ]))),
+    );
   }
 }

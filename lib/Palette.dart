@@ -10,4 +10,11 @@ class Palette {
   static const red = const Color(0xFFda0000);
   static const darkred = const Color(0xFF4b0000);
   static const white = const Color(0xFFFFFFFF);
+
+  static const buttonTheme = const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 26,
+              fontWeight: FontWeight.w600,
+              color: Palette.white,
+            );
 }

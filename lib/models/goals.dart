@@ -21,13 +21,15 @@ class GoalList extends ChangeNotifier {
     final List<Map<String, dynamic>> milestones =
         await DatabaseHelper.getMilestonesData();
 
-    List<Milestone> _milestones = milestones
-        .map((milestone) => Milestone(
-            key: milestone["id"],
-            parentKey: milestone["parentId"],
-            title: milestone["title"],
-            enddate: DateTime.parse(milestone["enddate"])))
-        .toList();
+    List<Milestone> _milestones = milestones.map((milestone) {
+      Milestone result = Milestone(
+          key: milestone["id"],
+          parentKey: milestone["parentId"],
+          title: milestone["title"],
+          enddate: DateTime.parse(milestone["enddate"]));
+      result.milestoneNumber = milestone["milestoneNumber"];
+      return result;
+    }).toList();
 
     goals.forEach((goal) {
       List<Milestone> _goalMilestones = _milestones
@@ -42,16 +44,15 @@ class GoalList extends ChangeNotifier {
           reminder: goal["reminder"] == 0 ? false : true,
           repeat: goal["repeat"],
           milestones: _goalMilestones,
+          totalMilestones: goal["totalMilestones"],
           notificationId: goal["notificationId"]);
 
-      finalGoal.sortAndNumberMilestones();
       _goals.add(finalGoal);
     });
     notifyListeners();
   }
 
   void addGoal(Goal goal) {
-    // MAY CRASH IF MILESTONES + REPEATER ADDED
     if (goal.repeat > 0) {
       var j = 0; // total num of goals
       DateTime date = DateTime.now();
@@ -91,11 +92,15 @@ class GoalList extends ChangeNotifier {
       return;
     }
 
+    goal.sortAndNumberMilestones();
+    int totalMilestones = 0;
     goal.milestones.forEach((milestone) {
+      totalMilestones++;
       DatabaseHelper.insertGoal("Milestones", {
         "id": milestone.key,
         "parentId": milestone.parentKey,
         "title": milestone.title,
+        "milestoneNumber": milestone.milestoneNumber,
         "enddate": milestone.enddate.toIso8601String(),
       });
     });
@@ -109,9 +114,10 @@ class GoalList extends ChangeNotifier {
       "repeat": goal.repeat,
       "enddate": goal.enddate.toIso8601String(),
       "notificationId": goal.notificationId,
+      "totalMilestones": totalMilestones,
     });
     goal.milestones.forEach((mile) => mile.parentTitle = goal.title);
-    goal.sortAndNumberMilestones();
+    goal.totalMilestones = totalMilestones;
     _goals.add(goal);
     notifyListeners();
   }
@@ -157,6 +163,7 @@ class Goal {
   final String desc;
   final DateTime enddate;
   final List<Milestone> milestones;
+  int totalMilestones;
   final int repeat; // in days
   final bool reminder;
   String notificationId;
@@ -172,6 +179,7 @@ class Goal {
     required this.reminder,
     required this.notificationId,
     this.parentKey = "not-recurring",
+    this.totalMilestones = 0,
   });
 
   List<Milestone> sortAndNumberMilestones() {
