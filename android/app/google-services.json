@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "217373902557",
+    "project_id": "goals-b97ef",
+    "storage_bucket": "goals-b97ef.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:217373902557:android:95c9354243428e2861bd34",
+        "android_client_info": {
+          "package_name": "com.elkadery.goalsapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "217373902557-7hjajcu36trq6v21an4p22fve6rabivb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCy-b-VToRhms5gRNApitZJVp0WZmBEqvY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "217373902557-7hjajcu36trq6v21an4p22fve6rabivb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:217373902557:android:92084153d922cb6161bd34",
+        "android_client_info": {
+          "package_name": "com.kareemelkadery.mygoals"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "217373902557-7hjajcu36trq6v21an4p22fve6rabivb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCy-b-VToRhms5gRNApitZJVp0WZmBEqvY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "217373902557-7hjajcu36trq6v21an4p22fve6rabivb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
