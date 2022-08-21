@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../Palette.dart';
+import '../../../Palette.dart';
 
 class GoalTileCopy extends StatelessWidget {
   final String title;
@@ -76,7 +76,7 @@ class GoalTileCopy extends StatelessWidget {
                     Text(
                       isGoal
                           ? "Goal"
-                          : "Milestone ${milestoneNumber}",
+                          : "Milestone $milestoneNumber",
                       style: TextStyle(
                           fontSize: 12,
                           fontFamily: "Poppins",

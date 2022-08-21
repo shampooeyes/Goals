@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mygoals/models/habits.dart';
 
-import '../Palette.dart';
+import '../../../Palette.dart';
 
 class HabitTile extends StatelessWidget {
   final Habit habit;

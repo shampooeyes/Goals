@@ -1,12 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
-import '../screens/edit_goal_screen.dart';
-import '../Palette.dart';
-import '../models/goals.dart';
-import '../models/history.dart';
+import '../../edit_goal/edit_goal_screen.dart';
+import '../../../Palette.dart';
+import '../../../models/goals.dart';
+import '../../../models/history.dart';
 
 class GoalTile extends StatefulWidget {
   final Key key;
@@ -19,6 +18,7 @@ class GoalTile extends StatefulWidget {
   final bool repeat;
   final bool reminder;
   final Function helper;
+  final Function undoFunc;
   final Function playConfetti;
   final String notificationId;
 
@@ -33,6 +33,7 @@ class GoalTile extends StatefulWidget {
     required this.repeat,
     required this.reminder,
     required this.helper,
+    required this.undoFunc,
     required this.playConfetti,
     required this.notificationId,
   }) : super(key: key);
@@ -43,9 +44,31 @@ class GoalTile extends StatefulWidget {
 
 class _GoalTileState extends State<GoalTile> {
   bool isFinished = false;
+  late GoalList goalProvider;
+  late Goal goal;
+  late var milestone;
 
-  Future<void> _completeGoal(BuildContext context, bool dismissed, bool delete) async {
-    final goalProvider = Provider.of<GoalList>(context, listen: false);
+
+  
+  @override
+  void initState() {
+    super.initState();
+    goalProvider = Provider.of<GoalList>(context, listen: false);
+
+     goal = widget.goal
+        ? goalProvider
+            .getGoals()
+            .firstWhere((goal) => goal.key == widget.goalKey)
+        : goalProvider
+            .getGoals()
+            .firstWhere((goal) => goal.key == widget.parentKey);
+     milestone = widget.goal
+        ? goal
+        : goal.milestones.firstWhere((mile) => mile.key == widget.goalKey);
+  }
+
+  Future<void> _completeGoal(
+      BuildContext context, bool dismissed, bool delete) async {
     if (widget.goal &&
         goalProvider
             .getGoals()
@@ -117,16 +140,6 @@ class _GoalTileState extends State<GoalTile> {
       }
     }
 
-    final goal = widget.goal
-        ? goalProvider
-            .getGoals()
-            .firstWhere((goal) => goal.key == widget.goalKey)
-        : goalProvider
-            .getGoals()
-            .firstWhere((goal) => goal.key == widget.parentKey);
-    final milestone = widget.goal
-        ? goal
-        : goal.milestones.firstWhere((mile) => mile.key == widget.goalKey);
     if (!delete) {
       widget.playConfetti();
       Provider.of<History>(context, listen: false)
@@ -143,6 +156,8 @@ class _GoalTileState extends State<GoalTile> {
 
   @override
   Widget build(BuildContext context) {
+    String goalType = widget.goal ? "Goal" : 'Milestone';
+
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(builder: (ctx) {
@@ -156,6 +171,18 @@ class _GoalTileState extends State<GoalTile> {
         child: Dismissible(
           key: UniqueKey(),
           onDismissed: (dir) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(dir == DismissDirection.endToStart
+                    ? "$goalType Completed"
+                    : "$goalType Deleted"),
+                action: SnackBarAction(
+                  label: "UNDO",
+                  textColor: Palette.secondary,
+                  onPressed: () {
+                    widget.undoFunc(widget.goal ? goal : milestone);
+                  },
+                )));
+
             if (dir == DismissDirection.endToStart)
               _completeGoal(context, true, false);
             else // confirm delete

@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mygoals/database/db_helper.dart';
 import 'package:mygoals/models/event.dart';
-import 'package:path/path.dart';
 
 class HabitList extends ChangeNotifier {
   List<Habit> _habits = [];
@@ -14,6 +13,7 @@ class HabitList extends ChangeNotifier {
     DatabaseHelper.insertHabit("Habits", {
       "id": habit.key,
       "title": habit.title,
+      "desc": habit.desc,
       "make": habit.make ? 1 : 0,
       "repeat": habit.repeat,
       "reminder": habit.reminder ? 1 : 0,
@@ -26,6 +26,14 @@ class HabitList extends ChangeNotifier {
       "id": habit.key,
       "dates": " ",
     });
+  }
+
+  void updateHabitEndDate(String id, DateTime enddate) {
+    DatabaseHelper.updateHabit(id, {
+      "enddate": enddate.toIso8601String(),
+    });
+    _habits.firstWhere(((element) => element.key == id)).enddate = enddate;
+    notifyListeners();
   }
 
   void updateHabit(Habit habit) {
@@ -222,9 +230,19 @@ class HabitList extends ChangeNotifier {
 
     final List<Map<String, dynamic>> habits =
         await DatabaseHelper.getHabitsData();
+
+    habits.forEach((habit) {
+      if (DateTime.parse(habit["enddate"])
+          .isBefore(DateTime.now().subtract(Duration(days: 1)))) {
+        habits.remove(habit);
+        removeItem(habit['id']);
+        habitEvents.remove(habit["id"]);
+      }
+    });
+
     _habits = habits.map((habit) {
-      final event = habitEvents.firstWhere((element) =>
-          element["id"] == habit["id"]); // {id: "id", dates: "date1 date2"}
+      final event = habitEvents.firstWhere((event) =>
+          event["id"] == habit["id"]); // {id: "id", dates: "date1 date2"}
 
       Map<DateTime, List<Event>> events = {};
       String doneDates = event["dates"] as String;
@@ -260,6 +278,7 @@ class HabitList extends ChangeNotifier {
         key: habit["id"],
         make: habit["make"] == 0 ? false : true,
         title: habit["title"],
+        desc: habit["title"],
         enddate: DateTime.parse(habit["enddate"]),
         creationDate: DateTime.parse(habit["creationDate"]),
         repeat: habit["repeat"],
@@ -276,7 +295,8 @@ class HabitList extends ChangeNotifier {
 class Habit {
   final String key;
   final String title;
-  final DateTime enddate;
+  final String desc;
+  DateTime enddate;
   final int repeat;
   final bool reminder;
   final bool make;
@@ -289,6 +309,7 @@ class Habit {
     required this.key,
     required this.make,
     required this.title,
+    required this.desc,
     required this.enddate,
     required this.creationDate,
     required this.repeat,

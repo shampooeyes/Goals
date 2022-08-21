@@ -6,8 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
-import '../Palette.dart';
-import 'new_milestone_screen.dart';
+import '../../Palette.dart';
+import '../new_milestone/new_milestone_screen.dart';
 
 class EditGoalScreen extends StatefulWidget {
   static const routeName = "edit-goal-screen";
@@ -29,7 +29,6 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
   late bool _reminder;
   late bool _repeater;
   int _repeatMultiplier = 1;
-  String _repeatPeriod = "days";
   TimeOfDay _selectedTime = TimeOfDay(hour: 12, minute: 0);
 
   @override
@@ -44,18 +43,6 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
     _repeater = goal.repeat != 0;
     _titleController.text = goal.title;
     _descController.text = goal.desc;
-
-    if (_repeater) {
-      if (goal.repeat % 30 == 0) {
-        _repeatPeriod = "months";
-        _repeatController.text = "${goal.repeat / 30}";
-      } else if (goal.repeat % 7 == 0) {
-        _repeatPeriod = "weeks";
-        _repeatController.text = "${goal.repeat / 7}";
-      } else
-        _repeatController.text = "${goal.repeat}";
-    } else
-      _repeatController.text = "2";
 
     super.initState();
   }
@@ -98,151 +85,6 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
       });
   }
 
-  Future<void> _selectRepeat(BuildContext context) {
-    final _tempController = TextEditingController();
-    _tempController.text = _repeater ? _repeatController.text : "";
-    return showDialog(
-        context: context,
-        builder: (ctx) {
-          return GestureDetector(
-            onTap: () {
-              FocusScopeNode currentFocus = FocusScope.of(context);
-              if (!currentFocus.hasPrimaryFocus &&
-                  currentFocus.focusedChild != null) currentFocus.unfocus();
-            },
-            child: StatefulBuilder(
-              builder: (ctx, setState) => AlertDialog(
-                title: Text(
-                  "Repeat Goal",
-                  style: TextStyle(color: Palette.text),
-                ),
-                backgroundColor: Palette.background,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
-                actions: [
-                  TextButton(
-                      onPressed: () {
-                        _repeater = false;
-                        Navigator.of(context).pop();
-                      },
-                      child: Text("CANCEL",
-                          style:
-                              Theme.of(context).textTheme.headline2!.copyWith(
-                                    fontSize: 16,
-                                    color: Palette.text,
-                                  ))),
-                  TextButton(
-                      onPressed: () {
-                        final number = int.tryParse(_tempController.text);
-                        if (number == null) {
-                          Navigator.of(context).pop();
-
-                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text("Please only enter numbers"),
-                            backgroundColor: Palette.darkred,
-                            duration: Duration(seconds: 3),
-                          ));
-                        } else {
-                          _repeatController.text = _tempController.text;
-
-                          _repeater = true;
-                          Navigator.of(context).pop();
-                        }
-                      },
-                      child: Text(
-                        "OK",
-                        style: Theme.of(context).textTheme.headline2!.copyWith(
-                              fontSize: 16,
-                              color: Palette.text,
-                            ),
-                      )),
-                ],
-                content: Row(
-                  children: [
-                    Text("Every", style: Theme.of(context).textTheme.bodyText1),
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 15),
-                      height: 30,
-                      width: 40,
-                      child: TextField(
-                        keyboardType: TextInputType.number,
-                        controller: _tempController,
-                        cursorColor: Palette.primary,
-                        style: Theme.of(context).textTheme.bodyText1,
-                        decoration: InputDecoration(
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Palette.primary, width: 2),
-                          ),
-                        ),
-                      ),
-                    ),
-                    DropdownButton(
-                      onTap: () {
-                        FocusScopeNode currentFocus = FocusScope.of(context);
-                        if (!currentFocus.hasPrimaryFocus &&
-                            currentFocus.focusedChild != null)
-                          currentFocus.unfocus();
-                      },
-                      dropdownColor: Palette.background,
-                      value: _repeatPeriod,
-                      onChanged: (value) {
-                        switch (value) {
-                          case "weeks":
-                            _repeatMultiplier = 7;
-                            setState(() {
-                              _repeatPeriod = "weeks";
-                            });
-                            break;
-                          case "months":
-                            _repeatMultiplier = 30;
-                            setState(() {
-                              _repeatPeriod = "months";
-                            });
-                            break;
-                          default:
-                            setState(() {
-                              _repeatPeriod = "days";
-                            });
-                            _repeatMultiplier = 1;
-                        }
-                      },
-                      items: [
-                        DropdownMenuItem(
-                          child: Center(
-                              child: Text(
-                            "days",
-                            style: Theme.of(context).textTheme.bodyText1,
-                          )),
-                          value: "days",
-                        ),
-                        DropdownMenuItem(
-                          child: Center(
-                              child: Text(
-                            "weeks",
-                            style: Theme.of(context).textTheme.bodyText1,
-                          )),
-                          value: "weeks",
-                        ),
-                        DropdownMenuItem(
-                          child: Center(
-                              child: Text(
-                            "months",
-                            style: Theme.of(context).textTheme.bodyText1,
-                          )),
-                          value: "months",
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        });
-  }
-
   void _submitGoal(BuildContext context) async {
     FocusScopeNode currentFocus = FocusScope.of(context);
     if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null)
@@ -269,7 +111,7 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
       final OSDeviceState? status = await OneSignal.shared.getDeviceState();
       if (status != null) {
         final playerId = status.userId;
-        final response = await OneSignal.shared.postNotificationWithJson({
+        await OneSignal.shared.postNotificationWithJson({
           "app_id": "bbdc8751-01db-4011-b5c6-79c78b349bd6",
           "include_player_ids": [playerId],
           "contents": {"en": "Reminder: ${_titleController.text.trim()}"},

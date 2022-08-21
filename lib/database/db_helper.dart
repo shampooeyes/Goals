@@ -22,12 +22,11 @@ class DatabaseHelper {
         return db.execute(
             "CREATE TABLE Milestones(id TEXT PRIMARY KEY, parentId TEXT, title TEXT, enddate TEXT, milestoneNumber INTEGER, reminder INTEGER)");
       }, version: 1);
-      int result = await milestoneDb.insert(
+      await milestoneDb.insert(
         table,
         data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace,
       );
-      print(result);
     }
   }
 
@@ -45,13 +44,27 @@ class DatabaseHelper {
     final db = await sql.openDatabase(path.join(dbPath, "habits.db"),
         onCreate: (db, version) {
       return db.execute(
-          "CREATE TABLE Habits(id TEXT PRIMARY KEY, title TEXT, enddate TEXT, creationDate INTEGER, make INTEGER, repeat INTEGER, reminder INTEGER)");
+          "CREATE TABLE Habits(id TEXT PRIMARY KEY, title TEXT, desc TEXT, enddate TEXT, creationDate INTEGER, make INTEGER, repeat INTEGER, reminder INTEGER)");
     }, version: 1);
     db.insert(
       table,
       data,
       conflictAlgorithm: sql.ConflictAlgorithm.replace,
     );
+  }
+
+  static Future<void> updateHabit(String id, Map<String, Object> data) async {
+    final dbPath = await sql.getDatabasesPath();
+    final db = await sql.openDatabase(path.join(dbPath, "habits.db"),
+        onCreate: (db, version) {
+      return db.execute(
+          "CREATE TABLE Habits(id TEXT PRIMARY KEY, title TEXT, desc TEXT, enddate TEXT, creationDate INTEGER, make INTEGER, repeat INTEGER, reminder INTEGER)");
+    }, version: 1);
+  await db.update(
+        'Habits',
+        data,
+        where: 'id = ?',
+        whereArgs: [id]);
   }
 
   static Future<void> insertHistory(Map<String, dynamic> data) async {
@@ -108,7 +121,7 @@ class DatabaseHelper {
     final habitDb = await sql.openDatabase(path.join(dbPath, "habits.db"),
         onCreate: (db, version) {
       return db.execute(
-          "CREATE TABLE Habits(id TEXT PRIMARY KEY, title TEXT, enddate TEXT, creationDate INTEGER, make INTEGER, repeat INTEGER, reminder INTEGER)");
+          "CREATE TABLE Habits(id TEXT PRIMARY KEY, title TEXT, desc TEXT, enddate TEXT, creationDate INTEGER, make INTEGER, repeat INTEGER, reminder INTEGER)");
     }, version: 1);
     return habitDb.query("Habits");
   }

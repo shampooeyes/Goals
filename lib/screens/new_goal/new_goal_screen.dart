@@ -6,9 +6,9 @@ import 'package:mygoals/models/habits.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import '/models/goals.dart';
-import '/screens/new_milestone_screen.dart';
+import '../new_milestone/new_milestone_screen.dart';
 
-import '../Palette.dart';
+import '../../Palette.dart';
 
 class NewGoalScreen extends StatefulWidget {
   static const routeName = "new_goal_screen";
@@ -25,6 +25,7 @@ class _NewGoalScreenState extends State<NewGoalScreen>
   final _repeatController = TextEditingController();
   final _titleController = TextEditingController();
   final _habitTitleController = TextEditingController();
+  final _habitDescController = TextEditingController();
   late final TabController _tabController;
 
   DateTime _targetDate =
@@ -49,6 +50,7 @@ class _NewGoalScreenState extends State<NewGoalScreen>
     _titleController.dispose();
     _habitTitleController.dispose();
     _tabController.dispose();
+    _habitDescController.dispose();
     super.dispose();
   }
 
@@ -109,152 +111,6 @@ class _NewGoalScreenState extends State<NewGoalScreen>
       });
   }
 
-  Future<void> _selectRepeat(BuildContext context) {
-    final _tempController = TextEditingController();
-    _repeatPeriod = _repeater ? _repeatPeriod : "days";
-    _tempController.text = _repeater ? _repeatController.text : "";
-    return showDialog(
-        context: context,
-        builder: (ctx) {
-          return GestureDetector(
-            onTap: () {
-              FocusScopeNode currentFocus = FocusScope.of(context);
-              if (!currentFocus.hasPrimaryFocus &&
-                  currentFocus.focusedChild != null) currentFocus.unfocus();
-            },
-            child: StatefulBuilder(
-              builder: (ctx, setState) => AlertDialog(
-                title: Text(
-                  "Repeat Goal",
-                  style: TextStyle(color: Palette.text),
-                ),
-                backgroundColor: Palette.background,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
-                actions: [
-                  TextButton(
-                      onPressed: () {
-                        _repeater = false;
-                        Navigator.of(context).pop();
-                      },
-                      child: Text("CANCEL",
-                          style:
-                              Theme.of(context).textTheme.headline2!.copyWith(
-                                    fontSize: 16,
-                                    color: Palette.text,
-                                  ))),
-                  TextButton(
-                      onPressed: () {
-                        final number = int.tryParse(_tempController.text);
-                        if (number == null) {
-                          Navigator.of(context).pop();
-
-                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text("Please only enter numbers"),
-                            backgroundColor: Palette.darkred,
-                            duration: Duration(seconds: 3),
-                          ));
-                        } else {
-                          _repeatController.text = _tempController.text;
-
-                          _repeater = true;
-                          Navigator.of(context).pop();
-                        }
-                      },
-                      child: Text(
-                        "OK",
-                        style: Theme.of(context).textTheme.headline2!.copyWith(
-                              fontSize: 16,
-                              color: Palette.text,
-                            ),
-                      )),
-                ],
-                content: Row(
-                  children: [
-                    Text("Every", style: Theme.of(context).textTheme.bodyText1),
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 15),
-                      height: 30,
-                      width: 40,
-                      child: TextField(
-                        keyboardType: TextInputType.number,
-                        controller: _tempController,
-                        cursorColor: Palette.primary,
-                        style: Theme.of(context).textTheme.bodyText1,
-                        decoration: InputDecoration(
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Palette.primary, width: 2),
-                          ),
-                        ),
-                      ),
-                    ),
-                    DropdownButton(
-                      onTap: () {
-                        FocusScopeNode currentFocus = FocusScope.of(context);
-                        if (!currentFocus.hasPrimaryFocus &&
-                            currentFocus.focusedChild != null)
-                          currentFocus.unfocus();
-                      },
-                      dropdownColor: Palette.background,
-                      value: _repeatPeriod,
-                      onChanged: (value) {
-                        switch (value) {
-                          case "weeks":
-                            _repeatMultiplier = 7;
-                            setState(() {
-                              _repeatPeriod = "weeks";
-                            });
-                            break;
-                          case "months":
-                            _repeatMultiplier = 30;
-                            setState(() {
-                              _repeatPeriod = "months";
-                            });
-                            break;
-                          default:
-                            setState(() {
-                              _repeatPeriod = "days";
-                            });
-                            _repeatMultiplier = 1;
-                        }
-                      },
-                      items: [
-                        DropdownMenuItem(
-                          child: Center(
-                              child: Text(
-                            "days",
-                            style: Theme.of(context).textTheme.bodyText1,
-                          )),
-                          value: "days",
-                        ),
-                        DropdownMenuItem(
-                          child: Center(
-                              child: Text(
-                            "weeks",
-                            style: Theme.of(context).textTheme.bodyText1,
-                          )),
-                          value: "weeks",
-                        ),
-                        DropdownMenuItem(
-                          child: Center(
-                              child: Text(
-                            "months",
-                            style: Theme.of(context).textTheme.bodyText1,
-                          )),
-                          value: "months",
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        });
-  }
-
   Future<void> _selectHabitRepeat(BuildContext context) {
     final _tempController = TextEditingController();
     _tempController.text = _repeatController.text;
@@ -282,12 +138,10 @@ class _NewGoalScreenState extends State<NewGoalScreen>
                         _repeater = false;
                         Navigator.of(context).pop();
                       },
-                      child: Text("CANCEL",
-                          style:
-                              Theme.of(context).textTheme.headline2!.copyWith(
-                                    fontSize: 16,
-                                    color: Palette.text,
-                                  ))),
+                      child: Text(
+                        "CANCEL",
+                        style: Theme.of(context).textTheme.subtitle1,
+                      )),
                   TextButton(
                       onPressed: () {
                         final number = int.tryParse(_tempController.text);
@@ -307,10 +161,7 @@ class _NewGoalScreenState extends State<NewGoalScreen>
                       },
                       child: Text(
                         "OK",
-                        style: Theme.of(context).textTheme.headline2!.copyWith(
-                              fontSize: 16,
-                              color: Palette.text,
-                            ),
+                        style: Theme.of(context).textTheme.subtitle1,
                       )),
                 ],
                 content: Row(
@@ -452,11 +303,11 @@ class _NewGoalScreenState extends State<NewGoalScreen>
       return;
     }
     if (_repeatController.text.isEmpty) _repeatController.text = "2";
-
     Provider.of<HabitList>(context, listen: false).addHabit(Habit(
       key: UniqueKey().toString(),
       make: _make,
       title: _habitTitleController.text.trim(),
+      desc: _habitDescController.text.trim(),
       enddate: _endDate,
       creationDate: DateTime.now(),
       reminder: _reminder,
@@ -467,6 +318,9 @@ class _NewGoalScreenState extends State<NewGoalScreen>
   }
 
   void _selectTime(BuildContext context) async {
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null)
+      currentFocus.unfocus();
     final time = await showTimePicker(
         context: context,
         initialTime: _selectedTime,
@@ -474,7 +328,6 @@ class _NewGoalScreenState extends State<NewGoalScreen>
               data: ThemeData.light().copyWith(
                   colorScheme: ColorScheme.light(
                       primary: Palette.secondary,
-                      // onSurface: ,
                       onSurface: Palette.secondary.withOpacity(0.7),
                       onBackground: Palette.secondary.withOpacity(0.1))),
               child: child!,
@@ -697,14 +550,14 @@ class _NewGoalScreenState extends State<NewGoalScreen>
                         ),
                       ),
                       SizedBox(
-                        width: 375.5, //360 +15.5 padding
+                        // width: 375.5, //360 +15.5 padding
                         child: ListView.builder(
                           shrinkWrap: true,
                           physics: ClampingScrollPhysics(),
                           itemBuilder: (ctx, index) {
                             return Container(
                               margin: const EdgeInsets.only(
-                                  left: 15.5, bottom: 7.5,right: 15.5),
+                                  left: 15.5, bottom: 7.5, right: 15.5),
                               height: 40,
                               decoration: BoxDecoration(
                                   borderRadius:
@@ -843,71 +696,6 @@ class _NewGoalScreenState extends State<NewGoalScreen>
                                 )
                               ],
                             ),
-                            // SizedBox(
-                            //   width: 50,
-                            // ),
-                            // Column(
-                            //   children: [
-                            //     Text(
-                            //       "Repeat",
-                            //       style: Theme.of(context)
-                            //           .textTheme
-                            //           .bodyText1
-                            //           ?.copyWith(
-                            //               color: _repeater
-                            //                   ? Palette.text
-                            //                   : Color(0xff989898)),
-                            //     ),
-                            //     SizedBox(height: 5),
-                            //     GestureDetector(
-                            //       onTap: () async {
-                            //         await _selectRepeat(context);
-                            //         Future.delayed(Duration(milliseconds: 1))
-                            //             .then((value) => setState(() {}));
-                            //         if (_repeatController.text.isEmpty) {
-                            //           setState(() => _repeater = false);
-                            //         }
-                            //       },
-                            //       child: Container(
-                            //         width: 100,
-                            //         height: 27,
-                            //         decoration: BoxDecoration(
-                            //             borderRadius:
-                            //                 BorderRadius.all(Radius.circular(8)),
-                            //             color: _repeater
-                            //                 ? Palette.primary
-                            //                 : Palette.milestone),
-                            //         child: Row(
-                            //           mainAxisAlignment: MainAxisAlignment.center,
-                            //           children: [
-                            //             Icon(
-                            //               CupertinoIcons.restart,
-                            //               color: _repeater
-                            //                   ? Palette.white
-                            //                   : Color(0xff989898),
-                            //               size: 13,
-                            //             ),
-                            //             SizedBox(width: 6),
-                            //             Text(
-                            //               _repeater
-                            //                   ? _repeatController.text +
-                            //                       " " +
-                            //                       _repeatPeriod
-                            //                   : "2 days",
-                            //               style: Theme.of(context)
-                            //                   .textTheme
-                            //                   .bodyText2
-                            //                   ?.copyWith(
-                            //                       color: _repeater
-                            //                           ? Palette.white
-                            //                           : Color(0xff989898)),
-                            //             ),
-                            //           ],
-                            //         ),
-                            //       ),
-                            //     )
-                            //   ],
-                            // ),
                           ],
                         ),
                       ),
@@ -1109,6 +897,62 @@ class _NewGoalScreenState extends State<NewGoalScreen>
                             ),
                           )),
                     ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 20.0, top: 14.5, bottom: 5),
+                        child: Text(
+                          "Habit Description",
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                          margin:
+                              const EdgeInsets.only(left: 15.5, right: 15.5),
+                          // width: 360,
+                          height: 60,
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              border: Border.all(
+                                  color: _make ? Palette.primary : Palette.red,
+                                  width: 1),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: const Color(0x1a000000),
+                                    offset: Offset(1.2246467991473532e-16, 2),
+                                    blurRadius: 8,
+                                    spreadRadius: 0)
+                              ],
+                              color: Palette.white),
+                          child: Container(
+                            height: 40,
+                            padding: const EdgeInsets.only(left: 10),
+                            child: TextField(
+                              controller: _habitDescController,
+                              keyboardType: TextInputType.multiline,
+                              maxLength: 100,
+                              maxLines: 2,
+                              cursorHeight: 13.5,
+                              cursorRadius: Radius.circular(15),
+                              cursorColor: Palette.primary,
+                              autocorrect: false,
+                              style: const TextStyle(
+                                color: Palette.text,
+                                fontFamily: "OpenSans",
+                                fontSize: 13.5,
+                              ),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                counterText: "",
+                              ),
+                            ),
+                          )),
+                    ),
                     Container(
                         margin: const EdgeInsets.only(top: 20),
                         child: Row(
@@ -1217,40 +1061,6 @@ class _NewGoalScreenState extends State<NewGoalScreen>
                               ),
                           ],
                         )),
-                    // Center(
-                    //   child: Container(
-                    //     margin: const EdgeInsets.only(top: 19.5),
-                    //     child: Column(children: [
-                    //       Text(
-                    //         "Remind Me",
-                    //         style: Theme.of(context).textTheme.bodyText1,
-                    //       ),
-                    //       Transform.scale(
-                    //         scale: 1.4,
-                    //         child: Checkbox(
-                    //           value: _reminder,
-                    //           onChanged: (val) {
-                    //             setState(() {
-                    //               _reminder = val!;
-                    //             });
-                    //           },
-                    //           splashRadius: 10,
-                    //           materialTapTargetSize:
-                    //               MaterialTapTargetSize.shrinkWrap,
-                    //           activeColor:
-                    //               _make ? Palette.primary : Palette.red,
-                    //           side: BorderSide(
-                    //               width: 2,
-                    //               color: _make ? Palette.primary : Palette.red),
-                    //           shape: RoundedRectangleBorder(
-                    //               borderRadius: BorderRadius.all(
-                    //             Radius.circular(4.5),
-                    //           )),
-                    //         ),
-                    //       ),
-                    //     ]),
-                    //   ),
-                    // ),
                   ],
                 )
               ],

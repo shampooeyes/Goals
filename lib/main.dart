@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mygoals/models/goals.dart';
 import 'package:mygoals/models/habits.dart';
-import 'package:mygoals/screens/goals_screen.dart';
-import 'package:mygoals/screens/history_screen.dart';
+import 'package:mygoals/screens/goals/goals_screen.dart';
+import 'package:mygoals/screens/history/history_screen.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 import 'package:provider/provider.dart';
 
 import 'Palette.dart';
 import 'models/history.dart';
-import 'screens/new_goal_screen.dart';
+import 'screens/new_goal/new_goal_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -52,32 +52,34 @@ class _MyAppState extends State<MyApp> {
           textSelectionTheme:
               TextSelectionThemeData(selectionHandleColor: Palette.primary),
           textTheme: TextTheme(
-            headline1: const TextStyle(
-              // Habits and Goals
-              fontFamily: 'Poppins',
-              fontSize: 26,
-              fontWeight: FontWeight.w500,
-              color: Palette.primary,
-            ),
-            headline2: const TextStyle(
-              // Goal tile header
-              fontFamily: "Poppins",
-              fontWeight: FontWeight.w500,
-              fontSize: 18,
-              color: Palette.white,
-            ),
-            bodyText1: const TextStyle(
-              fontFamily: 'OpenSans',
-              fontSize: 15,
-              fontWeight: FontWeight.w400,
-              color: Palette.text,
-            ),
-            bodyText2: const TextStyle(
+              headline1: const TextStyle(
+                // Habits and Goals
+                fontFamily: 'Poppins',
+                fontSize: 26,
+                fontWeight: FontWeight.w500,
+                color: Palette.primary,
+              ),
+              headline2: const TextStyle(
+                // Goal tile header
+                fontFamily: "Poppins",
+                fontWeight: FontWeight.w500,
+                fontSize: 18,
                 color: Palette.white,
-                fontWeight: FontWeight.w600,
-                fontFamily: "OpenSans",
-                fontSize: 13.0),
-          ),
+              ),
+              bodyText1: const TextStyle(
+                fontFamily: 'OpenSans',
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+                color: Palette.text,
+              ),
+              bodyText2: const TextStyle(
+                  color: Palette.white,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: "OpenSans",
+                  fontSize: 13.0),
+              subtitle1: DefaultTextStyle.of(context)
+                  .style
+                  .copyWith(color: Palette.secondary, fontWeight: FontWeight.w500)),
           appBarTheme: const AppBarTheme(
             toolbarHeight: 56,
             titleTextStyle: TextStyle(

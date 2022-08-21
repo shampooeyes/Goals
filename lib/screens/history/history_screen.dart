@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mygoals/models/history.dart';
-import 'package:mygoals/widgets/date_scroller.dart';
-import 'package:mygoals/widgets/history_tile.dart';
+import 'package:mygoals/screens/history/widgets/date_scroller.dart';
 import 'package:provider/provider.dart';
+
+import 'widgets/history_card.dart';
 
 class HistoryScreen extends StatefulWidget {
   static const routeName = "history-screen";
@@ -52,7 +53,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
             //History items filtered by datescroller
             Consumer<History>(builder: (ctx, snapshot, child) {
-              List<HistoryItem> _items = snapshot.getHistory(filterDate).reversed.toList();
+              List<HistoryItem> _items =
+                  snapshot.getHistory(filterDate).reversed.toList();
               return Container(
                 height: device.size.height -
                     device.viewPadding.bottom -
@@ -63,7 +65,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   itemCount: _items.length,
                   itemBuilder: (ctx, index) {
                     return Container(
-                      child: HistoryTile(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 2.5),
+                      child: HistoryCard(
                         itemKey: _items[index].key,
                         title: _items[index].title,
                         desc: _items[index].desc,

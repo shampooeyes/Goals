@@ -7,16 +7,16 @@ import 'package:intl/intl.dart';
 import 'package:mygoals/models/goals.dart';
 import 'package:mygoals/models/habits.dart';
 import 'package:mygoals/models/history.dart';
-import 'package:mygoals/screens/habit_details_screen.dart';
-import 'package:mygoals/screens/history_screen.dart';
-import 'package:mygoals/screens/new_goal_screen.dart';
-import 'package:mygoals/widgets/date_chip.dart';
-import 'package:mygoals/widgets/goal_tile.dart';
-import 'package:mygoals/widgets/goal_tile_copy.dart';
-import 'package:mygoals/widgets/habit_tile.dart';
+import 'package:mygoals/screens/habit_details/habit_details_screen.dart';
+import 'package:mygoals/screens/history/history_screen.dart';
+import 'package:mygoals/screens/new_goal/new_goal_screen.dart';
+import 'package:mygoals/screens/goals/widgets/date_chip.dart';
+import 'package:mygoals/screens/goals/widgets/goal_tile.dart';
+import 'package:mygoals/screens/goals/widgets/goal_tile_copy.dart';
+import 'package:mygoals/screens/goals/widgets/habit_tile.dart';
 import 'package:provider/provider.dart';
 
-import '../Palette.dart';
+import '../../Palette.dart';
 
 class GoalsScreen extends StatefulWidget {
   @override
@@ -28,13 +28,13 @@ class _GoalsScreenState extends State<GoalsScreen> {
   late DateTime selectedDate;
   @override
   void initState() {
-    initialize();
+    _initialize();
     _confettiController =
         ConfettiController(duration: const Duration(milliseconds: 400));
     super.initState();
   }
 
-  void initialize() async {
+  Future<void> _initialize() async {
     final goalProvider = Provider.of<GoalList>(context, listen: false);
     await goalProvider.fetchAndSetGoals();
     List<DateTime> dates = goalProvider.getDates();
@@ -387,6 +387,12 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                   final bool isGoal =
                                       tiles[index].runtimeType == Goal;
 
+                                  void undoCompletion(Goal goal) {
+                                    snapshot.addGoal(goal);
+                                    Provider.of<History>(context, listen: false)
+                                        .removeItem(goal.key);
+                                  }
+
                                   void removeItem(Key key, var goal,
                                       Goal associatedGoal, bool dismissed) {
                                     if (!dismissed)
@@ -421,9 +427,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                               ),
                                           duration:
                                               Duration(milliseconds: 350));
-                                    else
+                                    else {
                                       _listKey.currentState!.removeItem(index,
                                           (context, animation) => Container());
+                                    }
                                     tiles.removeAt(index);
 
                                     isGoal
@@ -459,6 +466,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                             : true,
                                         reminder: tiles[index].reminder,
                                         helper: removeItem,
+                                        undoFunc: undoCompletion,
                                         playConfetti: playConfetti,
                                         notificationId:
                                             tiles[index].notificationId,
@@ -498,6 +506,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                       repeat: false,
                                       reminder: associatedGoal.reminder,
                                       helper: removeItem,
+                                      undoFunc: undoCompletion,
                                       playConfetti: playConfetti,
                                       notificationId: "",
                                     ),

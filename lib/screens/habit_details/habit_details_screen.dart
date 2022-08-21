@@ -1,10 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mygoals/models/event.dart';
 import 'package:mygoals/models/habits.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import '../Palette.dart';
+import '../../Palette.dart';
 
 class HabitDetailsScreen extends StatefulWidget {
   final Habit habit;
@@ -17,17 +19,56 @@ class HabitDetailsScreen extends StatefulWidget {
 
 class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
   late final ValueNotifier<List<Event>> _selectedEvents;
-  late final _totalEvents;
+  late var _totalEvents;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+  late DateTime enddate;
 
   @override
   void initState() {
+    enddate = widget.habit.enddate;
     _totalEvents = widget.habit.events;
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsfromDay(_selectedDay!));
     super.initState();
+  }
+
+  updateHabit(DateTime newEnddate) async {
+    enddate = newEnddate;
+    final habitListProvider = Provider.of<HabitList>(context, listen: false);
+
+    habitListProvider.updateHabitEndDate(widget.habit.key, newEnddate);
+    await habitListProvider.fetchAndSetHabits();
+    setState(() {
+      _totalEvents = habitListProvider
+          .getHabits()
+          .firstWhere((habit) => habit.key == widget.habit.key)
+          .events;
+    });
+  }
+
+  Future<void> _selectDate(BuildContext context, DateTime initDate) async {
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null)
+      currentFocus.unfocus();
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2050),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.light(primary: Palette.secondary),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (pickedDate != null && pickedDate != widget.habit.enddate) {
+      updateHabit(pickedDate);
+    }
   }
 
   List<Event> _getEventsfromDay(DateTime date) {
@@ -40,16 +81,13 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
         builder: (ctx) => AlertDialog(
               title: Text("Are you sure?"),
               content: Text("Delete \"$title\""),
+              contentTextStyle: Theme.of(context).textTheme.bodyText1,
               actions: [
                 TextButton(
                     onPressed: Navigator.of(context).pop,
                     child: Text(
                       "Cancel",
-                      style: const TextStyle(
-                        fontFamily: "OpenSans",
-                        fontSize: 17,
-                        color: Color(0xff303030),
-                      ),
+                      style: Theme.of(context).textTheme.subtitle1,
                     )),
                 TextButton(
                     onPressed: () {
@@ -60,11 +98,7 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
                     },
                     child: Text(
                       "OK",
-                      style: const TextStyle(
-                        fontFamily: "OpenSans",
-                        fontSize: 17,
-                        color: Color(0xff303030),
-                      ),
+                      style: Theme.of(context).textTheme.subtitle1,
                     ))
               ],
             ));
@@ -79,22 +113,46 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
         return true;
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.habit.title,
-              style: Theme.of(context).appBarTheme.titleTextStyle),
-        ),
+        appBar: AppBar(),
         body: Container(
           color: Palette.background,
           child: Column(
             children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Text(
+                    widget.habit.title,
+                    style: Theme.of(context).textTheme.headline1!.copyWith(
+                        color:
+                            widget.habit.make ? Palette.primary : Palette.red),
+                  ),
+                ),
+              ),
+              if (widget.habit.desc.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Wrap(children: [
+                      Text(
+                        widget.habit.desc,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1!
+                            .copyWith(fontSize: 16),
+                      ),
+                    ]),
+                  ),
+                ),
               TableCalendar(
                 firstDay: widget.habit.creationDate,
-                lastDay: DateTime(2023),
+                lastDay: DateTime(2025),
                 focusedDay: _focusedDay,
                 calendarFormat: _calendarFormat,
-                selectedDayPredicate: (day) {
-                  return isSameDay(_selectedDay, day);
-                },
+                selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
                 onDaySelected: (selectedDay, focusedDay) {
                   if (!isSameDay(_selectedDay, selectedDay)) {
                     setState(() {
@@ -111,9 +169,7 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
                     });
                   }
                 },
-                onPageChanged: (focusedDay) {
-                  _focusedDay = focusedDay;
-                },
+                onPageChanged: (focusedDay) => _focusedDay = focusedDay,
                 availableCalendarFormats: const {
                   CalendarFormat.month: 'Week',
                   CalendarFormat.week: 'Month',
@@ -152,8 +208,15 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
                   singleMarkerBuilder: (context, date, event) {
                     Color cor = Palette.darkred;
                     if (event.runtimeType == Event) {
+                      DateTime today = DateTime(DateTime.now().year,
+                          DateTime.now().month, DateTime.now().day);
                       if ((event as Event).done) {
+                        // if not done and before today mark with red
                         cor = widget.habit.make ? Palette.primary : Palette.red;
+                      } else if (event.date.isBefore(today)) {
+                        cor = isSameDay(_selectedDay, event.date)
+                            ? Palette.red.withOpacity(0)
+                            : Palette.red;
                       } else {
                         cor = widget.habit.make
                             ? Palette.primary.withOpacity(0.4)
@@ -171,18 +234,13 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              Expanded(
-                child: ValueListenableBuilder<List<Event>>(
-                    valueListenable: _selectedEvents,
-                    builder: (context, value, _) {
-                      return Container(
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: value.length,
-                          itemBuilder: (ctx, index) {
-                            final event = value[index];
-                            if (event.date.isAfter(DateTime.now()))
-                              return Container(
+              ValueListenableBuilder<List<Event>>(
+                  valueListenable: _selectedEvents,
+                  builder: (context, value, _) {
+                    final event = value[0];
+                    return Container(
+                        child: (event.date.isAfter(DateTime.now()))
+                            ? Container(
                                 alignment: Alignment.center,
                                 margin: const EdgeInsets.symmetric(
                                     horizontal: 15, vertical: 10),
@@ -198,55 +256,91 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen> {
                                   style: TextStyle(
                                       color: Color(0xff989898), fontSize: 16),
                                 ),
-                              );
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  event.done = !event.done;
-                                });
-                              },
-                              child: Container(
-                                alignment: Alignment.center,
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 15, vertical: 10),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: event.done
-                                      ? widget.habit.make
-                                          ? Palette.primary
-                                          : Palette.red
-                                      : Palette.background,
-                                  border: Border.all(
-                                      width: 1.5,
-                                      color: widget.habit.make
-                                          ? Palette.primary
-                                          : Palette.red),
-                                  borderRadius: BorderRadius.circular(5),
+                              )
+                            : GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    event.done = !event.done;
+                                  });
+                                },
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 10),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: event.done
+                                        ? widget.habit.make
+                                            ? Palette.primary
+                                            : Palette.red
+                                        : Palette.background,
+                                    border: Border.all(
+                                        width: 1.5,
+                                        color: widget.habit.make
+                                            ? Palette.primary
+                                            : Palette.red),
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: Text(
+                                    widget.habit.make ? "Done" : "Relapse",
+                                    style: TextStyle(
+                                        color: event.done
+                                            ? Palette.white
+                                            : widget.habit.make
+                                                ? Palette.primary
+                                                : Palette.red,
+                                        fontSize: 16),
+                                  ),
                                 ),
-                                child: Text(
-                                  widget.habit.make ? "Done" : "Relapse",
-                                  style: TextStyle(
-                                      color: event.done
-                                          ? Palette.white
-                                          : widget.habit.make
-                                              ? Palette.primary
-                                              : Palette.red,
-                                      fontSize: 16),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    }),
-              ),
+                              ));
+                  }),
               Spacer(),
+              Column(
+                children: [
+                  Text(
+                    "End Date",
+                    style: Theme.of(context).textTheme.bodyText1,
+                  ),
+                  SizedBox(height: 5),
+                  GestureDetector(
+                    onTap: () {
+                      _selectDate(context, widget.habit.enddate);
+                    },
+                    child: Container(
+                      width: 115,
+                      height: 27,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                          color: widget.habit.make
+                              ? Palette.primary
+                              : Palette.red),
+                      child: Row(
+                        children: [
+                          Text(
+                            DateFormat("dd/MM/yyyy").format(enddate),
+                            style: Theme.of(context).textTheme.bodyText2,
+                          ),
+                          Spacer(),
+                          GestureDetector(
+                              onTap: () {},
+                              child: Icon(
+                                Icons.calendar_today,
+                                size: 12,
+                                color: Palette.white,
+                              ))
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
               GestureDetector(
                 onTap: () => confirmDelete(widget.habit.title),
                 child: Container(
                   alignment: Alignment.center,
                   width: 170,
-                  margin: const EdgeInsets.symmetric(vertical: 30),
+                  margin: const EdgeInsets.only(bottom: 30, top: 15),
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
