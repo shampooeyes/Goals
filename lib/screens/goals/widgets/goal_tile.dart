@@ -167,6 +167,7 @@ class _GoalTileState extends State<GoalTile> {
         child: Dismissible(
           key: UniqueKey(),
           onDismissed: (dir) {
+            ScaffoldMessenger.of(context).removeCurrentSnackBar();
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(dir == DismissDirection.endToStart
                     ? "$goalType Completed"
