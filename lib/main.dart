@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mygoals/models/goals.dart';
 import 'package:mygoals/models/habits.dart';
 import 'package:mygoals/screens/goals/goals_screen.dart';
 import 'package:mygoals/screens/history/history_screen.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 import 'package:provider/provider.dart';
 
@@ -24,10 +24,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
+    FlutterLocalNotificationsPlugin().initialize(InitializationSettings(android: AndroidInitializationSettings('logo')));
     super.initState();
-    OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
-    final appId = "bbdc8751-01db-4011-b5c6-79c78b349bd6";
-    OneSignal.shared.setAppId(appId);
   }
 
   @override

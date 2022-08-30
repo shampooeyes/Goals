@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 import 'package:mygoals/models/goals.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
 
 import '../../Palette.dart';
 import '../new_milestone/new_milestone_screen.dart';
@@ -30,6 +31,7 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
   late bool _repeater;
   int _repeatMultiplier = 1;
   TimeOfDay _selectedTime = TimeOfDay(hour: 12, minute: 0);
+  var flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   @override
   void initState() {
@@ -43,7 +45,6 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
     _repeater = goal.repeat != 0;
     _titleController.text = goal.title;
     _descController.text = goal.desc;
-
     super.initState();
   }
 
@@ -99,27 +100,41 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
       return;
     }
     if (_reminder) {
+      if (DateTime(_targetDate.year, _targetDate.month,
+              _targetDate.day, _selectedTime.hour, _selectedTime.minute).isBefore(DateTime.now())) {
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Cannot set reminder before current time"),
+        backgroundColor: Palette.darkred,
+        duration: Duration(seconds: 3),
+      ));
+      return;
+      }
       if (goal.reminder) {
-        String appId = "bbdc8751-01db-4011-b5c6-79c78b349bd6";
-        http.delete(Uri.parse(
-            "https://onesignal.com/api/v1/notifications/${goal.notificationId}?app_id=$appId"));
+        flutterLocalNotificationsPlugin.cancel(goal.key.hashCode);
       }
 
+      flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.requestPermission();
       final date = DateTime(_targetDate.year, _targetDate.month,
-          _targetDate.day, _selectedTime.hour, _selectedTime.minute);
+              _targetDate.day, _selectedTime.hour, _selectedTime.minute)
+          .toUtc();
 
-      final OSDeviceState? status = await OneSignal.shared.getDeviceState();
-      if (status != null) {
-        final playerId = status.userId;
-        await OneSignal.shared.postNotificationWithJson({
-          "app_id": "bbdc8751-01db-4011-b5c6-79c78b349bd6",
-          "include_player_ids": [playerId],
-          "contents": {"en": "Reminder: ${_titleController.text.trim()}"},
-          "delayed_option": "timezone",
-          "delivery_time_of_day": date.toIso8601String(),
-          "android_channel_id": "16de5e7e-7580-4500-b445-6a18917bd6e5",
-        });
-      }
+      tz.initializeTimeZones();
+
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+          goal.key.hashCode,
+          "Reminder",
+          _titleController.text.trim(),
+          tz.TZDateTime.from(date, tz.UTC),
+          const NotificationDetails(
+              android: AndroidNotificationDetails('Channel ID', 'Channel 1',
+                  channelDescription: 'Goal Channel', color: Color.fromARGB(255, 255, 184, 91))),
+          androidAllowWhileIdle: true,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime);
     }
 
     final provider = Provider.of<GoalList>(context, listen: false);

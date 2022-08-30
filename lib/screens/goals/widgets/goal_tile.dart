@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 
 import '../../edit_goal/edit_goal_screen.dart';
 import '../../../Palette.dart';
@@ -48,21 +48,19 @@ class _GoalTileState extends State<GoalTile> {
   late Goal goal;
   late var milestone;
 
-
-  
   @override
   void initState() {
     super.initState();
     goalProvider = Provider.of<GoalList>(context, listen: false);
 
-     goal = widget.goal
+    goal = widget.goal
         ? goalProvider
             .getGoals()
             .firstWhere((goal) => goal.key == widget.goalKey)
         : goalProvider
             .getGoals()
             .firstWhere((goal) => goal.key == widget.parentKey);
-     milestone = widget.goal
+    milestone = widget.goal
         ? goal
         : goal.milestones.firstWhere((mile) => mile.key == widget.goalKey);
   }
@@ -148,9 +146,7 @@ class _GoalTileState extends State<GoalTile> {
     widget.helper(widget.key, milestone, goal,
         dismissed); //milestone is the same goal if type is Goal
     if (widget.goal && widget.reminder) {
-      String appId = "bbdc8751-01db-4011-b5c6-79c78b349bd6";
-      http.delete(Uri.parse(
-          "https://onesignal.com/api/v1/notifications/${widget.notificationId}?app_id=$appId"));
+      FlutterLocalNotificationsPlugin().cancel(goal.key.hashCode);
     }
   }
 
