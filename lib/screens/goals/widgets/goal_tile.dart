@@ -312,7 +312,11 @@ class _GoalTileState extends State<GoalTile> {
                                 isFinished = value;
                               });
                               Future.delayed(Duration(milliseconds: 200),
-                                  () => _completeGoal(context, false, false));
+                                  () {
+                                    _completeGoal(context, false, false);
+                                    widget.undoFunc(widget.goal ? goal : milestone);
+                                    }
+                              );
                             },
                           ),
                         ],
